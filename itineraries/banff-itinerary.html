@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banff — Three-Day Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:      #F6F4EF;
+  --ink:        #18201F;
+  --ink-mid:    #54595A;
+  --ink-light:  #939798;
+  --border:     #DEDAD2;
+  --lake:       #1789A6;
+  --yoho:       #1C6E5C;
+  --canyon:     #3F6B8C;
+  --gold:       #C8932E;
+  --hero-bg:    #0A1C24;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero { background: var(--hero-bg); padding: 3rem 3rem 2.5rem; position: relative; }
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(to right, #1789A6 0%, #1C6E5C 40%, #3F6B8C 74%, #C8932E 100%);
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #5C97A8; margin-bottom: 0.75rem;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 600;
+  color: #ECE7DD; line-height: 1.08; letter-spacing: -0.5px; margin-bottom: 0.4rem;
+}
+.hero-subtitle {
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px;
+  color: #6FA3B0; margin-bottom: 1.75rem;
+}
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #7FAAB6; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #46727C; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: 0.01em; }
+.eco-lake   { background: rgba(23,137,166,0.42); color: #8FD3E2; border: 1px solid rgba(40,160,185,0.4); }
+.eco-yoho   { background: rgba(28,110,92,0.45);  color: #8FCBB9; border: 1px solid rgba(45,140,115,0.4); }
+.eco-canyon { background: rgba(63,107,140,0.45); color: #A6C5DC; border: 1px solid rgba(95,140,175,0.4); }
+.eco-gold   { background: rgba(200,147,46,0.32); color: #E6C277; border: 1px solid rgba(200,147,46,0.45); }
+
+/* ── MAPS ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 1.75rem; }
+.map-block:last-child { margin-bottom: 0; }
+.map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; gap: 1rem; flex-wrap: wrap; }
+.map-label { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-light); }
+.gmaps-btn {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-mid);
+  text-decoration: none; padding: 5px 11px; border: 1px solid var(--border);
+  border-radius: 3px; background: #fff; transition: all 0.15s;
+}
+.gmaps-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map { width: 100%; height: 360px; border-radius: 4px; border: 1px solid var(--border); background: #DCE6E8; }
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.map-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+.map-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+
+/* ── DAY SECTIONS ── */
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem; border-bottom-width: 1.5px; border-bottom-style: solid;
+}
+.lake-day .day-header   { border-color: var(--lake);   color: var(--lake); }
+.yoho-day .day-header   { border-color: var(--yoho);   color: var(--yoho); }
+.canyon-day .day-header { border-color: var(--canyon); color: var(--canyon); }
+.day-num {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600;
+  line-height: 1; letter-spacing: -1.5px; padding-top: 2px; min-width: 48px;
+}
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date { font-size: 11.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-top: 3px; }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute; left: -2.25rem; top: 7px; width: 15px; height: 15px;
+  border-radius: 50%; border: 2.5px solid var(--paper); background: var(--border);
+}
+.dot-neutral { background: #939798; }
+.dot-lake    { background: var(--lake); }
+.dot-yoho    { background: var(--yoho); }
+.dot-canyon  { background: var(--canyon); }
+.dot-gold    { background: var(--gold); }
+.stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
+.stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
+.tag-hike-l  { background: #D7EEF3; color: #0D4E5C; }
+.tag-hike-g  { background: #DCEEE6; color: #164E3C; }
+.tag-hike-b  { background: #DCE6F0; color: #1F3F58; }
+.tag-gold    { background: #FBF0DC; color: #7A5518; }
+.tag-warn    { background: #FDF0E6; color: #8B4410; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 590px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+
+/* ── ECO DIVIDER ── */
+.eco-divider {
+  display: flex; align-items: center; gap: 10px; margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── TIPS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #EDEAE3; border-left: 4px solid var(--lake); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.01em; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+
+/* ── WARNING BOX ── */
+.warning-box { margin-top: 2rem; padding: 1rem 1.25rem; background: #D7EEF3; border-left: 4px solid var(--lake); font-size: 13px; color: #133F49; line-height: 1.6; }
+.warning-box b { color: #0A2C34; font-weight: 600; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 2rem; padding: 1rem 2.5rem 0; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-light);
+}
+
+/* ── PRINT ── */
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: white; }
+  .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stop, .day-section, .tips { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Alberta &amp; BC &nbsp;·&nbsp; Canadian Rockies</div>
+    <h1 class="hero-title">Banff &amp; Yoho</h1>
+    <div class="hero-subtitle">Three days of turquoise lakes, waterfalls, and canyon catwalks</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>July 25–27, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Base: 160 Kananaskis Way, Canmore</div>
+      <div class="meta-item"><span class="meta-dot"></span>Ends in Calgary</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-lake">💧 Glacial lakes</span>
+      <span class="eco-badge eco-yoho">🌲 Yoho waterfalls</span>
+      <span class="eco-badge eco-canyon">🪨 Canyon + lakeshore</span>
+      <span class="eco-badge eco-gold">🛶 Canoe + alpine</span>
+    </div>
+  </div>
+
+  <!-- MAPS -->
+  <div class="maps-section">
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 1 · Moraine + Lake Louise</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=160+Kananaskis+Way,Canmore,AB&destination=160+Kananaskis+Way,Canmore,AB&waypoints=Banff+townsite,AB|Lake+Louise+Park+and+Ride,AB|Moraine+Lake,AB|Lake+Louise,AB&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#939798"></span>Base / drive</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1789A6"></span>Lakes</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Dinner in Banff</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 2 · Yoho National Park</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=160+Kananaskis+Way,Canmore,AB&destination=160+Kananaskis+Way,Canmore,AB&waypoints=Emerald+Lake,Field,BC|Natural+Bridge,Yoho+National+Park,BC|Wapta+Falls+Trailhead,BC|Takakkaw+Falls,BC&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#939798"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1C6E5C"></span>Yoho stops</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 3 · Johnston Canyon → Minnewanka → Calgary</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=160+Kananaskis+Way,Canmore,AB&destination=105B+Magnolia+Grove+SE,Calgary,AB&waypoints=Johnston+Canyon,AB|Lake+Minnewanka,AB|Banff+townsite,AB&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day3-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#939798"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#3F6B8C"></span>Canyon + lake</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Calgary (end)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="content">
+
+    <!-- DAY 1 -->
+    <div class="day-section lake-day">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <div class="day-title">Downtown Banff · Moraine Lake · Lake Louise · Little Beehive</div>
+          <div class="day-date">Friday, July 25 · Glacial lakes</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">8:30 AM</div>
+          <div class="stop-name">Morning in downtown Banff</div>
+          <div class="stop-desc">Drive in from Canmore (~25 min) for a relaxed start — coffee on Banff Avenue and a quick look at the Bow River before the lakes. Keep it short: you need to be at the Lake Louise Park &amp; Ride for your shuttle window, ~45 min further west. Leave Banff by ~11:30 AM.</div>
+        </div>
+
+        <div class="eco-divider">Moraine Lake · shuttle access only</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">1:00 PM</div>
+          <div class="stop-name">Moraine Lake</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-l">Easy walk</span>
+            <span class="tag tag-warn">Shuttle reservation required</span>
+          </div>
+          <div class="stop-desc">Board the 1 PM Parks Canada shuttle at the Lake Louise Park &amp; Ride (private vehicles can't drive Moraine Lake Road). Climb the Rockpile for the classic Ten Peaks view, then walk the flat Lakeshore Trail along the water. Aim to keep it to about an hour so you can catch the connector with time to spare.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Rockpile + Lakeshore Trail</b> &nbsp;~3 km total &nbsp;·&nbsp; flat &nbsp;·&nbsp; ~1 hr &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">2:30 PM</div>
+          <div class="stop-name">Lake Connector to Lake Louise</div>
+          <div class="stop-desc">Take the free Lake Connector shuttle between the two lakes (included with your reservation, first come first served). Allow for a short wait — it's the least predictable link in the day. Arrive at the Lake Louise lakeshore around 3:00–3:15.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">3:15 PM</div>
+          <div class="stop-name">Little Beehive</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-l">Main hike</span>
+            <span class="tag tag-warn">Last shuttle ~7:30 PM</span>
+          </div>
+          <div class="stop-desc">Climb from the Lake Louise lakeshore past Mirror Lake to the Lake Agnes Tea House, then up the short spur to the Little Beehive lookout over the Bow Valley. This is the version of the climb that fits before the last shuttle — Big Beehive adds ~1.5 hrs and would push you past it. If the connector ran late, turn around at the tea house and you'll still have done most of the climb. Back at the lakeshore by ~6:45.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Little Beehive via Lake Agnes</b> &nbsp;~8.5 km RT &nbsp;·&nbsp; ~500 m gain &nbsp;·&nbsp; ~3–3.5 hrs &nbsp;·&nbsp; Moderate</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Back toward Banff</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-gold"></div>
+          <div class="stop-time">7:30 PM</div>
+          <div class="stop-name">Dinner in downtown Banff</div>
+          <div class="stop-desc">Catch a return shuttle to the Park &amp; Ride (last one ~7:30 PM), then drive back east to Banff townsite for dinner on Banff Avenue. From there it's ~25 min home to Canmore.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">10:00 PM</div>
+          <div class="stop-name">Return to Canmore</div>
+          <div class="stop-desc">~25 min east on the Trans-Canada to 160 Kananaskis Way. Watch for elk on the highway after dark.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day-section yoho-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <div class="day-title">Emerald Lake canoe · Natural Bridge · Wapta Falls · Takakkaw Falls</div>
+          <div class="day-date">Saturday, July 26 · Yoho National Park (BC)</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">7:45 AM</div>
+          <div class="stop-name">Depart Canmore</div>
+          <div class="stop-desc">Early start is the whole strategy today — it gets you to Emerald Lake before the parking fills and while the water is still glassy. ~1.25 hrs west on the Trans-Canada, over the BC border past Field. Weekend crowds make the early arrival matter even more.</div>
+        </div>
+
+        <div class="eco-divider">Emerald Lake · paddle first</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-yoho"></div>
+          <div class="stop-time">9:15 AM</div>
+          <div class="stop-name">Emerald Lake — canoe</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-g">Canoe</span>
+            <span class="tag tag-warn">First come, no reservations</span>
+          </div>
+          <div class="stop-desc">Rent at the Boathouse Trading Co. and paddle the green glacial water under the President Range. Going first thing means easy parking, calm water, and short or no rental line. One adult (19+) per canoe required.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Canoe rental</b> &nbsp;$100/hr per canoe (fits up to 3) &nbsp;·&nbsp; last canoes out 4:45 PM</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-yoho"></div>
+          <div class="stop-time">10:45 AM</div>
+          <div class="stop-name">Natural Bridge</div>
+          <div class="stop-desc">A quick stop on Emerald Lake Road as you head back out — the Kicking Horse River has carved a rock bridge and is steadily punching through it. Five minutes of walking, a couple of viewpoints. Still mid-morning, so ahead of the day's peak.</div>
+          <div class="stop-specs">
+            <div class="spec">Viewpoint &nbsp;·&nbsp; ~15 min</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Wapta Falls · western end</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-yoho"></div>
+          <div class="stop-time">11:45 AM</div>
+          <div class="stop-name">Wapta Falls</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-g">Short hike</span>
+          </div>
+          <div class="stop-desc">Drive ~30 min west to the widest waterfall on the Kicking Horse River. The hike in keeps crowds thinner than the roadside stops, so midday timing is fine here. Doing Wapta now — before doubling back east — is what keeps the day from backtracking.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Wapta Falls Trail</b> &nbsp;4.6 km RT &nbsp;·&nbsp; ~150 m gain &nbsp;·&nbsp; ~1.5–2 hrs &nbsp;·&nbsp; Easy–moderate</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Takakkaw Falls · on the way home</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-yoho"></div>
+          <div class="stop-time">3:00 PM</div>
+          <div class="stop-name">Takakkaw Falls</div>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Tight switchbacks</span>
+          </div>
+          <div class="stop-desc">Drive back east and up Yoho Valley Road to one of Canada's tallest waterfalls (~373 m). It's the easternmost stop, closest to home, so it's the natural finale. Busier in the afternoon, but it's a giant falls where crowds matter far less than at the canoe dock. Short walk from the lot to the base.</div>
+          <div class="stop-specs">
+            <div class="spec">Yoho Valley Road &nbsp;·&nbsp; no long trailers &nbsp;·&nbsp; ~45 min on site</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">4:30 PM</div>
+          <div class="stop-name">Return to Canmore</div>
+          <div class="stop-desc">~1.5 hrs back east on the Trans-Canada to 160 Kananaskis Way. Dinner in Canmore on Main Street.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="day-section canyon-day">
+      <div class="day-header">
+        <div class="day-num">03</div>
+        <div class="day-info">
+          <div class="day-title">Johnston Canyon · Lake Minnewanka · on to Calgary</div>
+          <div class="day-date">Monday, July 27 · Canyon, lakeshore, city</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">7:30 AM</div>
+          <div class="stop-name">Depart Canmore</div>
+          <div class="stop-desc">Early start beats the Johnston Canyon crowds, which build fast even on a weekday. ~45 min to the trailhead on the Bow Valley Parkway (Hwy 1A). Pack the car fully — you're not returning to Canmore, you finish in Calgary tonight.</div>
+        </div>
+
+        <div class="eco-divider">Johnston Canyon · go early</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">8:15 AM</div>
+          <div class="stop-name">Johnston Canyon</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-b">Main hike</span>
+            <span class="tag tag-warn">Crowds build by mid-morning</span>
+          </div>
+          <div class="stop-desc">Walk the catwalks bolted into the limestone canyon to the Lower then Upper Falls. Going at opening keeps the narrow walkways from bottlenecking. Monday helps too, but the lot still fills — early is the move. Turn around at the Lower Falls if you're short on time; the first section is the most dramatic.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Lower + Upper Falls</b> &nbsp;~5.4 km RT &nbsp;·&nbsp; ~120 m gain &nbsp;·&nbsp; ~2.5 hrs &nbsp;·&nbsp; Easy–moderate</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Lake Minnewanka · east side, toward Calgary</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">11:30 AM</div>
+          <div class="stop-name">Lake Minnewanka loop</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-b">Easy strolls</span>
+          </div>
+          <div class="stop-desc">Drive the scenic loop on the east side of the park — Two Jack Lake for the mirror reflections, then Lake Minnewanka itself for an easy lakeshore wander. Optional 1-hour boat cruise if the timing lines up. Being on the east side means you're already pointed toward Calgary.</div>
+          <div class="stop-specs">
+            <div class="spec">Lakeshore walks &nbsp;·&nbsp; ~1.5–2 hrs &nbsp;·&nbsp; Easy &nbsp;·&nbsp; optional boat cruise</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">1:30 PM</div>
+          <div class="stop-name">Lunch in Banff townsite</div>
+          <div class="stop-desc">Loop back into Banff (~15 min) for a late lunch on Banff Avenue before leaving the mountains. Last chance for park-town food and a final look at the peaks.</div>
+        </div>
+
+        <div class="eco-divider">Off to the city</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-gold"></div>
+          <div class="stop-time">3:00 PM</div>
+          <div class="stop-name">Drive to Calgary</div>
+          <div class="stop-desc">~1.5 hrs east on the Trans-Canada to 105B Magnolia Grove SE. Leaving mid-afternoon gets you in with daylight to spare for your friend to explore — Stephen Avenue, the Calgary Tower, Prince's Island Park, or the East Village riverwalk are all easy evening wanders.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips">
+      <div class="tips-heading">Field notes &amp; logistics</div>
+      <div class="tips-grid">
+        <div class="tip"><b>Park passes</b> — Banff, Yoho, and the lakes corridor all need a valid Parks Canada pass. A Discovery Pass covers the whole trip; display it on the dash. Note: the Canada Strong Pass waived Banff entry fees June 19–Sep 7 in 2026 — verify before you go.</div>
+        <div class="tip"><b>Moraine shuttle</b> — Reserve the 1 PM slot in advance at reservation.pc.gc.ca; Moraine Lake Road is closed to private cars. 40% of seats release in April, the rest 48 hrs before at 8 AM MT. The free Lake Connector is first come, first served.</div>
+        <div class="tip"><b>Last shuttle</b> — The final return from the Lake Louise lakeshore to the Park &amp; Ride is ~7:30 PM. It's the hard deadline that shapes Day 1 — keep Little Beehive moving to make it.</div>
+        <div class="tip"><b>Emerald Lake canoe</b> — First come, no reservations; $100/hr per canoe, last boats out 4:45 PM. Arrive before 10 AM for parking and calm water. No cell service at the lake.</div>
+        <div class="tip"><b>Yoho Valley Road</b> — The road to Takakkaw Falls opens late June and has tight switchbacks — no long trailers or large RVs. Confirm it's open for late July before relying on it.</div>
+        <div class="tip"><b>Wildlife + weather</b> — Elk, deer, black and grizzly bears are active in July. Carry bear spray on the trails, keep distance, and slow down at dusk on the highways. Mountain weather shifts fast; pack a warm layer and rain shell even on clear mornings.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Banff + Yoho National Parks &nbsp;·&nbsp; parks.canada.ca &nbsp;·&nbsp; base: Canmore, ends in Calgary</span>
+      <span>July 25–27, 2026</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof L === 'undefined') {
+    ['day1-map','day2-map','day3-map'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#54595A">Map library failed to load. Check your internet connection and refresh.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(s){
+      L.marker([s.lat, s.lng], { icon: pin(s.color, s.label) })
+        .addTo(map)
+        .bindPopup('<b>' + s.name + '</b><br>' + s.desc);
+      bounds.push([s.lat, s.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    segments.forEach(function(seg){
+      var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
+                '?overview=full&geometries=geojson';
+
+      var placeholder = L.polyline(seg.points, {
+        color: seg.color, weight: 2, opacity: 0.25, dashArray: '4,6'
+      }).addTo(map);
+
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.routes || !data.routes[0]) return;
+          map.removeLayer(placeholder);
+          var line = data.routes[0].geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+          L.polyline(line, {
+            color: seg.color, weight: 3.5, opacity: 0.75, dashArray: seg.dash || null
+          }).addTo(map);
+        })
+        .catch(function(){ /* keep placeholder if routing fails */ });
+    });
+  }
+
+  // ── DAY 1 ──
+  buildMap('day1-map',
+    [
+      { name: 'Canmore (base)',       lat: 51.0884, lng: -115.3479, label: 'B', color: '#939798', desc: '160 Kananaskis Way' },
+      { name: 'Downtown Banff',       lat: 51.1784, lng: -115.5708, label: '1', color: '#C8932E', desc: '8:30 AM · Coffee + Bow River' },
+      { name: 'Lake Louise Park & Ride', lat: 51.4419, lng: -116.1773, label: '2', color: '#939798', desc: '1 PM shuttle check-in' },
+      { name: 'Moraine Lake',         lat: 51.3217, lng: -116.1860, label: '3', color: '#1789A6', desc: '1 PM · Rockpile + Lakeshore' },
+      { name: 'Lake Louise',          lat: 51.4170, lng: -116.2170, label: '4', color: '#1789A6', desc: '3:15 PM · Little Beehive' }
+    ],
+    [
+      { color: '#939798', points: [[51.0884,-115.3479], [51.1784,-115.5708], [51.4419,-116.1773]] },
+      { color: '#1789A6', dash: '5,5', points: [[51.4419,-116.1773], [51.3217,-116.1860]] },
+      { color: '#1789A6', dash: '5,5', points: [[51.3217,-116.1860], [51.4170,-116.2170]] },
+      { color: '#939798', points: [[51.4170,-116.2170], [51.1784,-115.5708], [51.0884,-115.3479]] }
+    ]
+  );
+
+  // ── DAY 2 ──
+  buildMap('day2-map',
+    [
+      { name: 'Canmore (base)',  lat: 51.0884, lng: -115.3479, label: 'B', color: '#939798', desc: 'Depart 7:45 AM' },
+      { name: 'Emerald Lake',    lat: 51.4429, lng: -116.5292, label: '1', color: '#1C6E5C', desc: '9:15 AM · Canoe' },
+      { name: 'Natural Bridge',  lat: 51.3911, lng: -116.4561, label: '2', color: '#1C6E5C', desc: '10:45 AM · Quick stop' },
+      { name: 'Wapta Falls',     lat: 51.1717, lng: -116.6717, label: '3', color: '#1C6E5C', desc: '11:45 AM · 4.6 km RT hike' },
+      { name: 'Takakkaw Falls',  lat: 51.4986, lng: -116.4730, label: '4', color: '#1C6E5C', desc: '3:00 PM · Tall falls, last stop' }
+    ],
+    [
+      { color: '#1C6E5C', points: [[51.0884,-115.3479], [51.4429,-116.5292]] },
+      { color: '#1C6E5C', points: [[51.4429,-116.5292], [51.3911,-116.4561]] },
+      { color: '#1C6E5C', points: [[51.3911,-116.4561], [51.1717,-116.6717]] },
+      { color: '#1C6E5C', points: [[51.1717,-116.6717], [51.4986,-116.4730]] },
+      { color: '#939798', dash: '5,5', points: [[51.4986,-116.4730], [51.0884,-115.3479]] }
+    ]
+  );
+
+  // ── DAY 3 ──
+  buildMap('day3-map',
+    [
+      { name: 'Canmore (base)',  lat: 51.0884, lng: -115.3479, label: 'B', color: '#939798', desc: 'Depart 7:30 AM' },
+      { name: 'Johnston Canyon', lat: 51.2453, lng: -115.8389, label: '1', color: '#3F6B8C', desc: '8:15 AM · Lower + Upper Falls' },
+      { name: 'Lake Minnewanka', lat: 51.2469, lng: -115.4119, label: '2', color: '#3F6B8C', desc: '11:30 AM · Loop + lakeshore' },
+      { name: 'Banff townsite',  lat: 51.1784, lng: -115.5708, label: '3', color: '#939798', desc: '1:30 PM · Lunch' },
+      { name: 'Calgary (end)',   lat: 50.9620, lng: -113.9650, label: 'E', color: '#C8932E', desc: '~4:30 PM · 105B Magnolia Grove SE' }
+    ],
+    [
+      { color: '#3F6B8C', points: [[51.0884,-115.3479], [51.2453,-115.8389]] },
+      { color: '#3F6B8C', points: [[51.2453,-115.8389], [51.2469,-115.4119]] },
+      { color: '#939798', points: [[51.2469,-115.4119], [51.1784,-115.5708]] },
+      { color: '#C8932E', dash: '5,5', points: [[51.1784,-115.5708], [50.9620,-113.9650]] }
+    ]
+  );
+});
+</script>
+</body>
+</html>

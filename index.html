@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graduation Trip 2026 — Rockies to the Pacific</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sidebar-bg:   #0A1822;
+  --sidebar-edge: #14252F;
+  --paper:        #F6F4EF;
+  --ink:          #18201F;
+  --ink-mid:      #55595A;
+  --ink-light:    #8A8E8F;
+  --side-text:    #C3D2D8;
+  --side-dim:     #6E8893;
+  --side-active:  #14323C;
+  --accent:       #2E8FA8;
+  --sidebar-w:    282px;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.app { display: flex; height: 100vh; width: 100%; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-edge);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 40;
+  transition: transform 0.28s ease;
+}
+
+.side-head {
+  padding: 1.75rem 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--sidebar-edge);
+  position: relative;
+}
+.side-head::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(to right, #14797E 0%, #2E8FA8 22%, #1789A6 42%, #2D6E4A 60%, #B8336A 80%, #3D3172 100%);
+}
+.brand-eyebrow {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--side-dim); margin-bottom: 0.5rem;
+}
+.brand-title {
+  font-family: 'Playfair Display', serif; font-size: 25px; font-weight: 600;
+  color: #ECE7DD; line-height: 1.1; letter-spacing: -0.3px;
+}
+.brand-sub {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 13.5px; color: var(--side-dim); margin-top: 0.35rem;
+}
+.brand-meta {
+  margin-top: 0.9rem; font-size: 11.5px; color: var(--side-text);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.brand-meta span { display: flex; align-items: center; gap: 7px; }
+.brand-meta .m-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ── NAV ── */
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.875rem 0.75rem 1.5rem;
+}
+.nav-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--side-dim);
+  padding: 0.75rem 0.75rem 0.5rem;
+}
+.nav-item {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 0.7rem 0.75rem; border-radius: 7px;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.15s;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: #11212B; }
+.nav-item.active { background: var(--side-active); }
+.nav-leg {
+  flex-shrink: 0; margin-top: 1px;
+  width: 24px; height: 24px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.nav-body { flex: 1; min-width: 0; }
+.nav-name {
+  font-size: 13.5px; font-weight: 500; color: #E7EDEF;
+  line-height: 1.25; letter-spacing: 0.01em;
+}
+.nav-item.active .nav-name { color: #fff; }
+.nav-dates {
+  font-size: 11px; color: var(--side-dim); margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.nav-foot {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--sidebar-edge);
+  font-size: 10.5px; color: var(--side-dim); line-height: 1.5;
+}
+
+/* ── MAIN ── */
+.main { flex: 1; position: relative; height: 100%; background: var(--paper); }
+.frame { width: 100%; height: 100%; border: 0; display: block; background: var(--paper); }
+.frame.hidden { display: none; }
+
+/* ── OVERVIEW PANE ── */
+.overview {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  padding: 0;
+  display: none;
+}
+.overview.show { display: block; }
+.ov-hero {
+  background: var(--sidebar-bg); color: #ECE7DD;
+  padding: 3rem 3rem 2.5rem; position: relative;
+}
+.ov-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(to right, #14797E 0%, #2E8FA8 22%, #1789A6 42%, #2D6E4A 60%, #B8336A 80%, #3D3172 100%);
+}
+.ov-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #5C97A8; margin-bottom: 0.75rem; }
+.ov-title { font-family: 'Playfair Display', serif; font-size: 44px; font-weight: 600; line-height: 1.08; letter-spacing: -0.5px; }
+.ov-subtitle { font-family: 'Playfair Display', serif; font-style: italic; font-size: 17px; color: #6FA3B0; margin-top: 0.5rem; }
+.ov-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.ov-stat .num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #ECE7DD; }
+.ov-stat .lbl { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #6E8893; margin-top: 2px; }
+
+.ov-body { padding: 2.25rem 3rem 3rem; max-width: 900px; }
+.ov-lead { font-size: 14.5px; color: var(--ink-mid); line-height: 1.7; margin-bottom: 1.75rem; max-width: 640px; }
+.ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(248px, 1fr)); gap: 0.875rem; }
+.ov-card {
+  border: 1px solid #E4E0D8; border-radius: 9px; padding: 1.1rem 1.15rem;
+  cursor: pointer; background: #fff; transition: all 0.15s; text-align: left;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.ov-card:hover { border-color: #C9C4B8; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+.ov-card-top { display: flex; align-items: center; gap: 9px; }
+.ov-card-leg { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+.ov-card-dates { font-size: 11px; color: var(--ink-light); letter-spacing: 0.03em; }
+.ov-card-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.ov-card-desc { font-size: 12.5px; color: var(--ink-mid); line-height: 1.55; }
+
+/* ── TOPBAR (mobile) ── */
+.topbar {
+  display: none;
+  align-items: center; gap: 12px;
+  padding: 0.75rem 1rem;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--sidebar-edge);
+  position: sticky; top: 0; z-index: 30;
+}
+.menu-btn {
+  width: 38px; height: 38px; border-radius: 7px;
+  border: 1px solid var(--sidebar-edge); background: #11212B;
+  color: #C3D2D8; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.menu-btn svg { width: 18px; height: 18px; }
+.topbar-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: #ECE7DD; }
+
+.scrim {
+  display: none;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 35;
+}
+.scrim.show { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 820px) {
+  body { overflow: auto; }
+  .app { flex-direction: column; height: auto; min-height: 100vh; }
+  .topbar { display: flex; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 24px rgba(0,0,0,0.3);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { height: calc(100vh - 55px); min-height: 480px; }
+  .ov-hero { padding: 2.25rem 1.5rem 2rem; }
+  .ov-title { font-size: 33px; }
+  .ov-body { padding: 1.5rem 1.5rem 2.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-head">
+      <div class="brand-eyebrow">Graduation Trip · 2026</div>
+      <div class="brand-title">Rockies to the Pacific</div>
+      <div class="brand-sub">Two countries, six parks, two weeks</div>
+      <div class="brand-meta">
+        <span><span class="m-dot"></span>Jul 22 – Aug 4, 2026</span>
+        <span><span class="m-dot"></span>Canadian Rockies → Montana → Washington</span>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <div class="nav-label">The Itinerary</div>
+      <!-- nav items injected by JS -->
+    </nav>
+
+    <div class="nav-foot">
+      Tap a leg to open its full day-by-day plan, interactive maps, and Google Maps links.
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Overview</div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="overview show" id="overview">
+      <div class="ov-hero">
+        <div class="ov-eyebrow">Graduation Trip · Summer 2026</div>
+        <div class="ov-title">Rockies to the Pacific</div>
+        <div class="ov-subtitle">From Jasper's glacial lakes to the wild Olympic coast</div>
+        <div class="ov-stats">
+          <div class="ov-stat"><div class="num">14</div><div class="lbl">Days</div></div>
+          <div class="ov-stat"><div class="num">6</div><div class="lbl">Legs</div></div>
+          <div class="ov-stat"><div class="num">2</div><div class="lbl">Countries</div></div>
+          <div class="ov-stat"><div class="num">6</div><div class="lbl">National parks</div></div>
+        </div>
+      </div>
+      <div class="ov-body">
+        <p class="ov-lead">A two-week road trip from the Canadian Rockies down to the Pacific Northwest — starting in Jasper, running the Icefields Parkway into Banff and Yoho, crossing into Montana for Glacier, then west to Mount Rainier and the three ecosystems of Olympic National Park. Pick any leg to see its full plan.</p>
+        <div class="ov-grid" id="ovGrid"><!-- cards injected by JS --></div>
+      </div>
+    </div>
+
+    <!-- ITINERARY IFRAME -->
+    <iframe class="frame hidden" id="frame" title="Itinerary" referrerpolicy="no-referrer"></iframe>
+  </div>
+
+</div>
+
+<script>
+var LEGS = [
+  { id: 'jasper',    file: 'itineraries/jasper_itinerary.html',            name: 'Jasper',              dates: 'Jul 22–23', color: '#14797E', desc: 'Maligne Lake, Sulphur Skyline, and Miette Hot Springs from a Hinton base.' },
+  { id: 'icefields', file: 'itineraries/icefields_parkway_itinerary.html', name: 'Icefields Parkway',   dates: 'Jul 24',    color: '#2E8FA8', desc: 'The full southbound run — waterfalls, the Athabasca Glacier, Peyto and Bow lakes.' },
+  { id: 'banff',     file: 'itineraries/banff-itinerary.html',             name: 'Banff & Yoho',        dates: 'Jul 25–27', color: '#1789A6', desc: 'Moraine and Lake Louise, an Emerald Lake canoe day, and Johnston Canyon.' },
+  { id: 'glacier',   file: 'itineraries/glacier_np_itinerary.html',        name: 'Glacier NP',          dates: 'Jul 28–31', color: '#2D6E4A', desc: 'Going-to-the-Sun Road and the alpine heart of Montana\u2019s crown jewel.' },
+  { id: 'rainier',   file: 'itineraries/mount_rainier_itinerary.html',     name: 'Mount Rainier',       dates: 'Aug 1',     color: '#B8336A', desc: 'A single big day — Paradise wildflowers and the Sunrise side of the volcano.' },
+  { id: 'olympic',   file: 'itineraries/olympic_np_itinerary.html',        name: 'Olympic NP',          dates: 'Aug 2–4',   color: '#3D3172', desc: 'Three ecosystems: subalpine ridge, temperate rainforest, and wild Pacific coast.' }
+];
+
+var nav = document.getElementById('nav');
+var ovGrid = document.getElementById('ovGrid');
+var frame = document.getElementById('frame');
+var overview = document.getElementById('overview');
+var topbarTitle = document.getElementById('topbarTitle');
+var sidebar = document.getElementById('sidebar');
+var scrim = document.getElementById('scrim');
+
+// Build nav items
+LEGS.forEach(function(leg, i){
+  var a = document.createElement('a');
+  a.className = 'nav-item';
+  a.href = '#' + leg.id;
+  a.id = 'nav-' + leg.id;
+  a.innerHTML =
+    '<span class="nav-leg" style="background:' + leg.color + '">' + (i + 1) + '</span>' +
+    '<span class="nav-body">' +
+      '<span class="nav-name">' + leg.name + '</span>' +
+      '<span class="nav-dates">' + leg.dates + '</span>' +
+    '</span>';
+  nav.appendChild(a);
+
+  var card = document.createElement('div');
+  card.className = 'ov-card';
+  card.onclick = function(){ location.hash = leg.id; };
+  card.innerHTML =
+    '<div class="ov-card-top">' +
+      '<span class="ov-card-leg" style="background:' + leg.color + '">' + (i + 1) + '</span>' +
+      '<span class="ov-card-dates">' + leg.dates + ' · 2026</span>' +
+    '</div>' +
+    '<div class="ov-card-name">' + leg.name + '</div>' +
+    '<div class="ov-card-desc">' + leg.desc + '</div>';
+  ovGrid.appendChild(card);
+});
+
+// Add overview nav entry at top
+var ovNav = document.createElement('a');
+ovNav.className = 'nav-item';
+ovNav.href = '#overview';
+ovNav.id = 'nav-overview';
+ovNav.innerHTML =
+  '<span class="nav-leg" style="background:#46727C">★</span>' +
+  '<span class="nav-body"><span class="nav-name">Trip overview</span>' +
+  '<span class="nav-dates">All six legs at a glance</span></span>';
+nav.insertBefore(ovNav, nav.children[1]);
+
+function clearActive(){
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+}
+
+function showOverview(){
+  clearActive();
+  document.getElementById('nav-overview').classList.add('active');
+  frame.classList.add('hidden');
+  overview.classList.add('show');
+  topbarTitle.textContent = 'Overview';
+  overview.scrollTop = 0;
+}
+
+function showLeg(leg){
+  clearActive();
+  var navEl = document.getElementById('nav-' + leg.id);
+  if (navEl) navEl.classList.add('active');
+  // only reload the iframe if the source actually changed
+  var target = leg.file;
+  if (frame.getAttribute('data-src') !== target) {
+    frame.src = target;
+    frame.setAttribute('data-src', target);
+  }
+  overview.classList.remove('show');
+  frame.classList.remove('hidden');
+  topbarTitle.textContent = leg.name;
+}
+
+function route(){
+  var hash = (location.hash || '').replace('#', '');
+  if (!hash || hash === 'overview') { showOverview(); }
+  else {
+    var leg = LEGS.filter(function(l){ return l.id === hash; })[0];
+    if (leg) { showLeg(leg); } else { showOverview(); }
+  }
+  closeSidebar();
+}
+
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', route);
+route();
+
+// Mobile sidebar toggle
+function openSidebar(){ sidebar.classList.add('open'); scrim.classList.add('show'); }
+function closeSidebar(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); }
+document.getElementById('menuBtn').addEventListener('click', openSidebar);
+scrim.addEventListener('click', closeSidebar);
+</script>
+</body>
+</html>

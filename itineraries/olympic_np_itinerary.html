@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olympic National Park — 3-Day Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:    #F7F5F0;
+  --ink:      #1A1A1A;
+  --ink-mid:  #5A5855;
+  --ink-light:#9A9693;
+  --border:   #E0DCD4;
+  --mountain: #3D3172;
+  --forest:   #1C5C3C;
+  --coast:    #1A507A;
+  --star:     #C8943C;
+  --hero-bg:  #09131E;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--hero-bg);
+  padding: 3rem 3rem 2.5rem;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(to right, #1A507A 0%, #1A6B50 35%, #5B4A8A 72%, #C8943C 100%);
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5E88A8;
+  margin-bottom: 0.75rem;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: #EDE8DF;
+  line-height: 1.08;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: #6A90A8;
+  margin-bottom: 1.75rem;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #7A9DB8;
+}
+
+.meta-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3E6A88;
+  flex-shrink: 0;
+}
+
+.eco-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.eco-badge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 13px;
+  border-radius: 20px;
+  letter-spacing: 0.01em;
+}
+
+.eco-mountain { background: rgba(61,49,114,0.45); color: #B8AEDC; border: 1px solid rgba(100,88,170,0.35); }
+.eco-forest   { background: rgba(28,92,60,0.45);  color: #90CAA4; border: 1px solid rgba(50,130,80,0.35); }
+.eco-coast    { background: rgba(26,80,122,0.45); color: #84BDD8; border: 1px solid rgba(50,110,160,0.35); }
+.eco-star     { background: rgba(200,148,60,0.28); color: #D9B46A; border: 1px solid rgba(200,148,60,0.38); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 0 2.5rem;
+}
+
+/* ── DAY SECTIONS ── */
+.day-section {
+  margin-top: 2.75rem;
+}
+
+.day-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem;
+  border-bottom-width: 1.5px;
+  border-bottom-style: solid;
+}
+
+.arrival-day  .day-header { border-color: #C4C0BA; color: #5A5855; }
+.mountain-day .day-header { border-color: var(--mountain); color: var(--mountain); }
+.coast-day    .day-header { border-color: var(--coast);    color: var(--coast); }
+
+.day-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  padding-top: 2px;
+  min-width: 48px;
+}
+
+.day-info { flex: 1; }
+
+.day-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.day-date {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-top: 3px;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  position: relative;
+  padding-left: 2.25rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--border);
+}
+
+.stop {
+  position: relative;
+  padding-bottom: 1.75rem;
+}
+
+.stop:last-child {
+  padding-bottom: 0;
+}
+
+.stop-dot {
+  position: absolute;
+  left: -2.25rem;
+  top: 7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid var(--paper);
+  background: var(--border);
+}
+
+/* Mountain day dots */
+.mountain-day .stop-dot           { background: var(--mountain); }
+.mountain-day .stop-dot.dim       { background: #7A6FAE; }
+.mountain-day .stop-dot.star      { background: var(--star); }
+
+/* Coast day dots */
+.coast-day .stop-dot.neutral      { background: #9A9693; }
+.coast-day .stop-dot.forest       { background: var(--forest); }
+.coast-day .stop-dot.coast        { background: var(--coast); }
+
+/* Arrival day dot */
+.arrival-day .stop-dot            { background: #9A9693; }
+
+.stop-time {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 3px;
+}
+
+.stop-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.2;
+}
+
+.stop-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.tag-hike-m  { background: #EAE6F5; color: #2E2560; }
+.tag-hike-g  { background: #E4F2E9; color: #174D31; }
+.tag-hike-b  { background: #E2EFF8; color: #143F62; }
+.tag-star    { background: #FBF0DC; color: #7A5518; }
+.tag-warn    { background: #FDF0E6; color: #8B4410; }
+
+.stop-desc {
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  line-height: 1.68;
+  max-width: 590px;
+}
+
+.stop-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 8px;
+}
+
+.spec {
+  font-size: 12px;
+  color: var(--ink-light);
+  font-weight: 400;
+}
+
+.spec b {
+  color: var(--ink-mid);
+  font-weight: 600;
+}
+
+/* ── ECOSYSTEM TRANSITION DIVIDER ── */
+.eco-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── TIPS ── */
+.tips {
+  margin-top: 2.75rem;
+  padding: 1.5rem 1.75rem 1.625rem;
+  background: #EFECE5;
+  border-left: 4px solid var(--mountain);
+}
+
+.tips-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem 2rem;
+}
+
+.tip {
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.6;
+}
+
+.tip b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 2rem;
+  padding: 1rem 2.5rem 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--ink-light);
+}
+
+/* ── MAPS ── */
+.maps-section {
+  padding: 2rem 2.5rem 0;
+}
+.map-block {
+  margin-bottom: 1.75rem;
+}
+.map-block:last-child { margin-bottom: 0; }
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.map-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.gmaps-btn {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-mid);
+  text-decoration: none;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #fff;
+  transition: all 0.15s;
+}
+.gmaps-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+
+.trip-map {
+  width: 100%;
+  height: 340px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: #DDE6E0;
+}
+.map-legend {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-top: 0.625rem;
+  font-size: 12px;
+  color: var(--ink-mid);
+}
+.map-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+.map-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px; height: 26px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-pin span {
+  transform: rotate(45deg);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── PRINT ── */
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: white; }
+  .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stop { page-break-inside: avoid; }
+  .day-section { page-break-inside: avoid; }
+  .tips { page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Washington State &nbsp;·&nbsp; Olympic Peninsula</div>
+    <h1 class="hero-title">Olympic National Park</h1>
+    <div class="hero-subtitle">A three-day field guide through three worlds</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>Aug 2–4, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Base: Port Angeles, WA</div>
+      <div class="meta-item"><span class="meta-dot"></span>Return to base each night</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-mountain">🏔 Subalpine</span>
+      <span class="eco-badge eco-forest">🌿 Temperate Rainforest</span>
+      <span class="eco-badge eco-coast">🌊 Wild Pacific Coast</span>
+      <span class="eco-badge eco-star">⭐ Stargazing</span>
+    </div>
+  </div>
+
+  <!-- MAPS -->
+  <div class="maps-section">
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 1 · Subalpine Loop</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=Port+Angeles,WA&destination=Port+Angeles,WA&waypoints=Hurricane+Ridge,WA|Sol+Duc+Falls+Trailhead,WA|Sol+Duc+Hot+Springs+Resort,WA|Lake+Crescent,WA&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#5A5855"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#3D3172"></span>Day stops</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 2 · Rainforest → Wild Coast</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=Port+Angeles,WA&destination=Port+Angeles,WA&waypoints=Hoh+Rainforest+Visitor+Center,WA|Ruby+Beach,WA|Rialto+Beach,WA&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#5A5855"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1C5C3C"></span>Rainforest</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1A507A"></span>Coast</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="content">
+
+    <!-- ARRIVAL -->
+    <div class="day-section arrival-day">
+      <div class="day-header">
+        <div class="day-num" style="font-size:28px;padding-top:6px;letter-spacing:0;color:#9A9693">AUG 2</div>
+        <div class="day-info">
+          <div class="day-title">Arrival &amp; stargazing</div>
+          <div class="day-date">Sunday · Drive in, settle, head up the ridge</div>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">~7:00 PM</div>
+          <div class="stop-name">Port Angeles · check in</div>
+          <div class="stop-desc">~2.5 hrs from Seattle via the Bainbridge ferry + Hwy 101. Drop bags, grab a quick dinner on Front Street. Pack warm layers and a red-light torch for the ridge.</div>
+        </div>
+        <div class="stop">
+          <div class="stop-dot" style="background:#C8943C"></div>
+          <div class="stop-time">9:30 PM</div>
+          <div class="stop-name">Hurricane Ridge — stargazing ⭐</div>
+          <div class="stop-tags">
+            <span class="tag tag-star">Certified dark sky</span>
+            <span class="tag tag-warn">Confirm road access</span>
+          </div>
+          <div class="stop-desc">45 min south of Port Angeles. Milky Way visible from ~10 PM in August. NPS ranger programs run Friday and Saturday nights — Aug 2 is a Sunday, so call the visitor centre (+1 360-565-3130) on arrival to confirm the road stays open for evening access. Drops to 8–10°C up top. Back to Port Angeles by midnight for a proper rest before Day 1.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="day-section mountain-day">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <div class="day-title">Hurricane Ridge · Sol Duc Falls + Hot Springs · Lake Crescent</div>
+          <div class="day-date">Monday, Aug 3 · Subalpine ecosystem</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">7:30 AM</div>
+          <div class="stop-name">Hurricane Ridge</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-m">Main hike</span>
+          </div>
+          <div class="stop-desc">Drive 17 miles south from Port Angeles (~45 min) to the most accessible subalpine zone in the park at 5,242 ft. Olympic marmots graze the meadows and the full Olympic Range fills the horizon. Hit the trailhead early — parking is completely full by 10 AM in August.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Hurricane Hill Trail</b> &nbsp;3.2 mi RT &nbsp;·&nbsp; 700 ft gain &nbsp;·&nbsp; ~2.5 hrs &nbsp;·&nbsp; Moderate</div>
+          </div>
+          <div class="stop-specs">
+            <div class="spec"><b>Big Meadow loop</b> &nbsp;0.5 mi paved &nbsp;·&nbsp; Easy add-on near visitor centre</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dim"></div>
+          <div class="stop-time">1:30 PM</div>
+          <div class="stop-name">Sol Duc Falls</div>
+          <div class="stop-desc">45-min drive west on Hwy 101, then 12 miles in off the highway. An easy 1.6 mi RT walk through old-growth Douglas fir leads to three-chute falls plunging into a narrow basalt gorge.</div>
+          <div class="stop-specs">
+            <div class="spec">1.6 mi RT &nbsp;·&nbsp; ~1.5 hrs &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dim"></div>
+          <div class="stop-time">3:30 PM</div>
+          <div class="stop-name">Sol Duc Hot Springs</div>
+          <div class="stop-desc">Three mineral pools (98°F, 101°F, 104°F) at the Sol Duc Hot Springs Resort, two miles back down the road from the falls trailhead. Day-use pass ~$20, towel rental available. The perfect recovery for the legs after Hurricane Hill. Plan ~1 hr.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Day-use pass</b> &nbsp;~$20 &nbsp;·&nbsp; Bring swimsuit + towel (or rent)</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dim"></div>
+          <div class="stop-time">5:00 PM</div>
+          <div class="stop-name">Lake Crescent + Marymere Falls</div>
+          <div class="stop-desc">Glacially carved lake of electric blue-green, impossibly clear. Marymere Falls Trail (1.8 mi RT) begins right from the lakeside parking and leads through cathedral old-growth to a 90-ft waterfall. Dinner at Storm King Smokehouse on the way back.</div>
+          <div class="stop-specs">
+            <div class="spec">1.8 mi RT &nbsp;·&nbsp; ~1.5 hrs &nbsp;·&nbsp; Easy–moderate</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day-section coast-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <div class="day-title">Hoh Rainforest · Ruby Beach · Rialto Beach</div>
+          <div class="day-date">Tuesday, Aug 4 · Rainforest + Pacific Coast ecosystems</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot neutral"></div>
+          <div class="stop-time">6:30 AM</div>
+          <div class="stop-name">Depart Port Angeles</div>
+          <div class="stop-desc">Leave no later than 6:30 AM. The Hoh is 2 hours away and a ranger checkpoint 5 miles before the visitor centre creates 2+ hour backlogs after 11 AM in peak summer. A timed-entry permit may also be required — check nps.gov/olym before the trip and book if needed.</div>
+        </div>
+
+        <div class="eco-divider">Rainforest ecosystem begins</div>
+
+        <div class="stop">
+          <div class="stop-dot forest"></div>
+          <div class="stop-time">9:00 AM</div>
+          <div class="stop-name">Hoh Rainforest</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-g">Main hike</span>
+          </div>
+          <div class="stop-desc">One of the few temperate rainforests on Earth. Start with the Hall of Mosses (0.8 mi loop) — bigleaf maple hung with club moss, entirely otherworldly. Then push 2–3 miles into the Hoh River Trail for old-growth solitude: Sitka spruce over 300 ft, complete quiet except for the river. The biodiversity in every square metre is staggering.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Hall of Mosses</b> &nbsp;0.8 mi loop</div>
+            <div class="spec"><b>Hoh River Trail</b> &nbsp;2–3 mi in and back</div>
+            <div class="spec">~2.5 hrs total &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Pacific Coast ecosystem begins</div>
+
+        <div class="stop">
+          <div class="stop-dot coast"></div>
+          <div class="stop-time">1:00 PM</div>
+          <div class="stop-name">Ruby Beach</div>
+          <div class="stop-desc">50-min drive south from Hoh on Hwy 101. Layered sea stacks, Abbey Island, red-purple pebbles from garnet-heavy volcanic rock. Five-minute trail from parking. Linger 2 hrs.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot coast"></div>
+          <div class="stop-time">4:30 PM</div>
+          <div class="stop-name">Rialto Beach</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-b">Main hike</span>
+            <span class="tag tag-warn">Check tide tables first</span>
+          </div>
+          <div class="stop-desc">~1.5 hr drive north via Forks. Hike to Hole-in-the-Wall, 3 mi RT along cobblestone coast flanked by bleached driftwood and sea stacks. Natural arch only passable at low tide — check the La Push tide table at tidesandcurrents.noaa.gov. August sunset ~8:30 PM, so you'll catch golden hour and sunset here. Then 1.5 hrs back to Port Angeles.</div>
+          <div class="stop-specs">
+            <div class="spec">3 mi RT &nbsp;·&nbsp; ~2.5 hrs &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips">
+      <div class="tips-heading">Field notes &amp; logistics</div>
+      <div class="tips-grid">
+        <div class="tip"><b>Entry pass</b> — America the Beautiful pass ($80/yr) covers Olympic NP + all US national parks. Buy at the entrance gate or online.</div>
+        <div class="tip"><b>Hoh timed entry</b> — May be required in peak summer. Check nps.gov/olym before the trip and book in advance if available.</div>
+        <div class="tip"><b>Rialto tides</b> — Look up Aug 4 low tide for La Push at tidesandcurrents.noaa.gov. Plan to be at the arch within 2 hrs of low tide.</div>
+        <div class="tip"><b>Stargazing access</b> — Call the Hurricane Ridge visitor centre (+1 360-565-3130) when you arrive to confirm whether the road is open on the night of Aug 3.</div>
+        <div class="tip"><b>Gear essentials</b> — Waterproof trail shoes (Hoh is muddy year-round), warm jacket + beanie for the ridge at night, trekking poles optional for Hurricane Hill.</div>
+        <div class="tip"><b>Wildlife</b> — Olympic black bears are active in summer. Store food properly. Mountain goats roam Hurricane Ridge — keep 50 yards distance.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Olympic National Park &nbsp;·&nbsp; nps.gov/olym &nbsp;·&nbsp; Visitor centre +1 360-565-3130</span>
+      <span>Aug 2–4, 2026</span>
+    </div>
+
+  </div>
+</div>
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof L === 'undefined') {
+    ['day1-map','day2-map'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#5A5855">Map library failed to load. Check your internet connection and refresh.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(s){
+      L.marker([s.lat, s.lng], { icon: pin(s.color, s.label) })
+        .addTo(map)
+        .bindPopup('<b>' + s.name + '</b><br>' + s.desc);
+      bounds.push([s.lat, s.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    // Fetch real road geometry for each segment from OSRM
+    segments.forEach(function(seg){
+      var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
+                '?overview=full&geometries=geojson';
+
+      // Draw a faint placeholder line first so something shows immediately
+      var placeholder = L.polyline(seg.points, {
+        color: seg.color, weight: 2, opacity: 0.25, dashArray: '4,6'
+      }).addTo(map);
+
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.routes || !data.routes[0]) return;
+          map.removeLayer(placeholder);
+          var line = data.routes[0].geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+          L.polyline(line, {
+            color: seg.color, weight: 3.5, opacity: 0.75, dashArray: seg.dash || null
+          }).addTo(map);
+        })
+        .catch(function(){ /* keep placeholder if routing fails */ });
+    });
+  }
+
+  // ── DAY 1 ──
+  buildMap('day1-map',
+    [
+      { name: 'Port Angeles',    lat: 48.1183, lng: -123.4335, label: 'B',  color: '#5A5855', desc: 'Base · all 3 nights' },
+      { name: 'Hurricane Ridge', lat: 47.9331, lng: -123.4096, label: '1',  color: '#3D3172', desc: '7:30 AM · Hurricane Hill Trail' },
+      { name: 'Sol Duc Falls',   lat: 47.9514, lng: -123.8197, label: '2',  color: '#3D3172', desc: '1:30 PM · 1.6 mi RT' },
+      { name: 'Sol Duc Hot Springs', lat: 47.9716, lng: -123.8633, label: '3', color: '#3D3172', desc: '3:30 PM · Recovery soak' },
+      { name: 'Lake Crescent',   lat: 48.0582, lng: -123.8132, label: '4',  color: '#3D3172', desc: '5 PM · Marymere Falls' }
+    ],
+    [
+      { color: '#3D3172', dash: '6,5', points: [
+        [48.1183,-123.4335], [47.9331,-123.4096], [47.9514,-123.8197],
+        [47.9716,-123.8633], [48.0582,-123.8132], [48.1183,-123.4335]
+      ]}
+    ]
+  );
+
+  // ── DAY 2 ──
+  buildMap('day2-map',
+    [
+      { name: 'Port Angeles',  lat: 48.1183, lng: -123.4335, label: 'B', color: '#5A5855', desc: 'Depart 6:30 AM' },
+      { name: 'Hoh Rainforest',lat: 47.8608, lng: -123.9348, label: '1', color: '#1C5C3C', desc: '9 AM · Hall of Mosses' },
+      { name: 'Ruby Beach',    lat: 47.7109, lng: -124.4154, label: '2', color: '#1A507A', desc: '1 PM · Sea stacks' },
+      { name: 'Rialto Beach',  lat: 47.9196, lng: -124.6383, label: '3', color: '#1A507A', desc: '4:30 PM · Hole-in-the-Wall + sunset' }
+    ],
+    [
+      { color: '#1C5C3C', points: [[48.1183,-123.4335], [47.8608,-123.9348]] },
+      { color: '#1A507A', points: [[47.8608,-123.9348], [47.7109,-124.4154]] },
+      { color: '#1A507A', points: [[47.7109,-124.4154], [47.9196,-124.6383]] },
+      { color: '#5A5855', dash: '5,5', points: [[47.9196,-124.6383], [48.1183,-123.4335]] }
+    ]
+  );
+});
+</script>
+</body>
+</html>

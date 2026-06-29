@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jasper — Two-Day Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:      #F6F4EF;
+  --ink:        #18201F;
+  --ink-mid:    #54595A;
+  --ink-light:  #939798;
+  --border:     #DEDAD2;
+  --lake:       #14797E;
+  --forest:     #2D5C3C;
+  --alpine:     #3F6B8C;
+  --golden:     #C8932E;
+  --hero-bg:    #0B1E23;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero { background: var(--hero-bg); padding: 3rem 3rem 2.5rem; position: relative; }
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(to right, #2D5C3C 0%, #14797E 40%, #3F6B8C 72%, #C8932E 100%);
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #5C8A8E; margin-bottom: 0.75rem;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 600;
+  color: #ECE7DD; line-height: 1.08; letter-spacing: -0.5px; margin-bottom: 0.4rem;
+}
+.hero-subtitle {
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px;
+  color: #6FA0A4; margin-bottom: 1.75rem;
+}
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #7FA8AC; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #466E72; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: 0.01em; }
+.eco-lake   { background: rgba(20,121,126,0.42); color: #8FD4D7; border: 1px solid rgba(40,150,155,0.4); }
+.eco-forest { background: rgba(45,92,60,0.45);  color: #93CBA5; border: 1px solid rgba(60,130,80,0.4); }
+.eco-alpine { background: rgba(63,107,140,0.45); color: #A6C5DC; border: 1px solid rgba(95,140,175,0.4); }
+.eco-warn   { background: rgba(200,147,46,0.32); color: #E6C277; border: 1px solid rgba(200,147,46,0.45); }
+
+/* ── MAPS ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 1.75rem; }
+.map-block:last-child { margin-bottom: 0; }
+.map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; gap: 1rem; flex-wrap: wrap; }
+.map-label { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-light); }
+.gmaps-btn {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-mid);
+  text-decoration: none; padding: 5px 11px; border: 1px solid var(--border);
+  border-radius: 3px; background: #fff; transition: all 0.15s;
+}
+.gmaps-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map { width: 100%; height: 380px; border-radius: 4px; border: 1px solid var(--border); background: #DDE6E0; }
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.map-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+.map-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+
+/* ── DAY SECTIONS ── */
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem; border-bottom-width: 1.5px; border-bottom-style: solid;
+}
+.lake-day .day-header   { border-color: var(--lake);  color: var(--lake); }
+.alpine-day .day-header { border-color: var(--alpine); color: var(--alpine); }
+.day-num {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600;
+  line-height: 1; letter-spacing: -1.5px; padding-top: 2px; min-width: 48px;
+}
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date { font-size: 11.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-top: 3px; }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute; left: -2.25rem; top: 7px; width: 15px; height: 15px;
+  border-radius: 50%; border: 2.5px solid var(--paper); background: var(--border);
+}
+.dot-neutral { background: #939798; }
+.dot-lake    { background: var(--lake); }
+.dot-forest  { background: var(--forest); }
+.dot-alpine  { background: var(--alpine); }
+.dot-golden  { background: var(--golden); }
+.stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
+.stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
+.tag-hike-l  { background: #D8EEEE; color: #0C4F52; }
+.tag-hike-a  { background: #DCE6F0; color: #1F3F58; }
+.tag-warn    { background: #FDF0E6; color: #8B4410; }
+.tag-soak    { background: #FBF0DC; color: #7A5518; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 590px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+
+/* ── ECO DIVIDER ── */
+.eco-divider {
+  display: flex; align-items: center; gap: 10px; margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── TIPS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #EDEAE3; border-left: 4px solid var(--lake); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.01em; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+
+/* ── WARNING BOX ── */
+.warning-box { margin-top: 2rem; padding: 1rem 1.25rem; background: #FBF0DC; border-left: 4px solid var(--golden); font-size: 13px; color: #5A4418; line-height: 1.6; }
+.warning-box b { color: #3F2F0F; font-weight: 600; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 2rem; padding: 1rem 2.5rem 0; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-light);
+}
+
+/* ── PRINT ── */
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: white; }
+  .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stop { page-break-inside: avoid; }
+  .day-section { page-break-inside: avoid; }
+  .tips { page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Alberta &nbsp;·&nbsp; Canadian Rockies</div>
+    <h1 class="hero-title">Jasper National Park</h1>
+    <div class="hero-subtitle">Turquoise lakes, a sulphur ridge, and the deepest canyon in the Rockies</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>July 22–23, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Base: Hinton, AB (130 Nickerson Ave)</div>
+      <div class="meta-item"><span class="meta-dot"></span>Arrive from Kamloops · Hwy 5 + Hwy 16</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-lake">💧 Glacial lakes</span>
+      <span class="eco-badge eco-alpine">⛰ Sulphur ridge</span>
+      <span class="eco-badge eco-forest">🌲 Montane valley</span>
+      <span class="eco-badge eco-warn">♨ Hot springs</span>
+    </div>
+  </div>
+
+  <!-- MAPS -->
+  <div class="maps-section">
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 1 · Kamloops → Maligne Lake → Hinton</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=Hampton+Inn+Kamloops,BC&destination=130+Nickerson+Ave,Hinton,AB&waypoints=Mount+Robson+Welcome+Centre,BC|Medicine+Lake,Jasper,AB|Maligne+Lake,Jasper,AB|Jasper+townsite,AB&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#939798"></span>Drive / base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#14797E"></span>Lakes</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Downtown evening</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 2 · Sulphur Skyline · Miette · Pyramid Lake</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=130+Nickerson+Ave,Hinton,AB&destination=130+Nickerson+Ave,Hinton,AB&waypoints=Miette+Hot+Springs,Jasper,AB|Pyramid+Lake,Jasper,AB&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#939798"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#3F6B8C"></span>Ridge + springs</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#14797E"></span>Lake</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="content">
+
+    <!-- DAY 1 -->
+    <div class="day-section lake-day">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <div class="day-title">Drive in · Medicine Lake · Maligne Lake · Jasper at night</div>
+          <div class="day-date">Tuesday, July 22 · Arrival + glacial lakes</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">7:00 AM</div>
+          <div class="stop-name">Depart Hampton Inn, Kamloops</div>
+          <div class="stop-desc">Yellowhead Hwy 5 north to Tête Jaune Cache, then Hwy 16 east. ~5.5 hrs of pure driving, so an early start keeps the afternoon open for the lakes. Fill up before Valemount — fuel thins out past there.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">12:30 PM</div>
+          <div class="stop-name">Mount Robson Welcome Centre</div>
+          <div class="stop-desc">Lunch stop with the clearest roadside view of the highest peak in the Canadian Rockies (3,954 m). Overlander Falls Trail (1 km RT) is right next door if you want to stretch. Gas + café on site.</div>
+        </div>
+
+        <div class="eco-divider">Maligne Valley · Glacial lakes</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">2:30 PM</div>
+          <div class="stop-name">Medicine Lake</div>
+          <div class="stop-desc">Turn onto Maligne Lake Road just east of Jasper townsite. Medicine Lake is the "disappearing lake" — it drains through an underground karst system, so its level swings dramatically through the season. Quick photo stop, scan the shoreline for elk and bears.</div>
+          <div class="stop-specs">
+            <div class="spec">Roadside viewpoint &nbsp;·&nbsp; ~20 min</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">3:30 PM</div>
+          <div class="stop-name">Maligne Lake</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-l">Easy walk</span>
+          </div>
+          <div class="stop-desc">The end of the road, and the largest natural lake in the Rockies — vivid turquoise framed by glaciated peaks. Arriving mid-afternoon, treat this as a scenic wind-down: walk the Mary Schäffer Loop (3.2 km, flat, ~1 hr) along the shoreline. The Spirit Island boat cruise and the Bald Hills hike both need more time than you'll have today — save those for a future trip or a full Maligne day.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Mary Schäffer Loop</b> &nbsp;3.2 km &nbsp;·&nbsp; flat &nbsp;·&nbsp; ~1 hr &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Back through the townsite</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-golden"></div>
+          <div class="stop-time">6:30 PM</div>
+          <div class="stop-name">Downtown Jasper — Connaught Drive</div>
+          <div class="stop-desc">Drive back down Maligne Lake Road and into the townsite for dinner. Jasper Brewing Co. on Connaught Drive does local craft beer and solid pub food (open till midnight); Evil Dave's Grill is the sit-down option. Wander Patricia Street for shops and ice cream. A relaxed evening to close the long drive day.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">8:30 PM</div>
+          <div class="stop-name">Drive to Hinton</div>
+          <div class="stop-desc">~50 min east on Hwy 16 to 130 Nickerson Ave. Watch for elk and deer on the highway at dusk — this stretch is an active wildlife corridor, so keep your speed down after dark.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day-section alpine-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <div class="day-title">Sulphur Skyline · Miette Hot Springs · Pyramid Lake</div>
+          <div class="day-date">Wednesday, July 23 · Alpine ridge + soak</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">7:00 AM</div>
+          <div class="stop-name">Depart Hinton</div>
+          <div class="stop-desc">~45 min west on Hwy 16, then 17 km up the Miette Hot Springs Road spur. The spur branches off before you reach the townsite, so there's zero backtracking. Start the hike early — Sulphur Skyline bakes in afternoon sun and the small lot fills fast.</div>
+        </div>
+
+        <div class="eco-divider">Fiddle Valley · Sulphur ridge</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-alpine"></div>
+          <div class="stop-time">8:30 AM</div>
+          <div class="stop-name">Sulphur Skyline Trail</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-a">Main hike</span>
+            <span class="tag tag-warn">Steep · strenuous</span>
+          </div>
+          <div class="stop-desc">Trailhead is at the Miette Hot Springs parking lot. A relentless climb on a well-graded path to a bare summit at 2,070 m with a full 360° panorama over the Fiddle Valley and the Ashlar Ridge. One of the best effort-to-reward viewpoints in the park — but the gain is no joke, so pace yourself and carry 2L+ of water.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Sulphur Skyline</b> &nbsp;8 km RT &nbsp;·&nbsp; 700 m gain &nbsp;·&nbsp; ~3.5 hrs &nbsp;·&nbsp; Strenuous</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-golden"></div>
+          <div class="stop-time">12:30 PM</div>
+          <div class="stop-name">Miette Hot Springs</div>
+          <div class="stop-tags">
+            <span class="tag tag-soak">Recovery soak</span>
+          </div>
+          <div class="stop-desc">Walk straight off the trail into the hottest natural mineral springs in the Canadian Rockies (pools kept around 40°C). The perfect reward for the legs. Day pass ~$20 CAD, swimsuit + towel needed (rentals available). Grab lunch at the springs café or picnic in the lot afterward.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Day pass</b> &nbsp;~$20 CAD &nbsp;·&nbsp; ~1.5 hrs incl. lunch</div>
+          </div>
+        </div>
+
+        <div class="eco-divider">Montane lakes near the townsite</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">3:30 PM</div>
+          <div class="stop-name">Pyramid Lake + Pyramid Island</div>
+          <div class="stop-desc">Drive back west past the townsite and 6 km up Pyramid Lake Road. Cross the footbridge to Pyramid Island — a tiny pine-covered islet with Pyramid Mountain reflected in the water. Ridiculously photogenic for almost no effort. Rent a canoe if the legs have recovered, or just take the easy loop trail.</div>
+          <div class="stop-specs">
+            <div class="spec">Footbridge + island &nbsp;·&nbsp; ~1.5 hrs &nbsp;·&nbsp; Easy</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">5:30 PM</div>
+          <div class="stop-name">Back to Hinton</div>
+          <div class="stop-desc">~50 min east on Hwy 16 to 130 Nickerson Ave. Dinner in town, or detour through the Jasper townsite one more time if you want a final meal in the park.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REALITY CHECK -->
+    <div class="warning-box">
+      <b>Day 2 is front-loaded by design.</b> &nbsp;Sulphur Skyline's 700 m climb is the hardest single effort of the trip, so it goes first while you're fresh, with the hot springs as the built-in reward right at the trailhead. Pyramid Lake in the afternoon is deliberately low-effort. If anyone's knees are done after the ridge, drop Pyramid and head straight back — you won't be missing a hike, just a photo stop.
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips">
+      <div class="tips-heading">Field notes &amp; logistics</div>
+      <div class="tips-grid">
+        <div class="tip"><b>Park pass</b> — Both days are inside Jasper National Park. A Parks Canada Discovery Pass or daily entry pass is required; display it on the dash. Buy online at parks.canada.ca or at the East Gate on Hwy 16.</div>
+        <div class="tip"><b>Hinton ↔ Jasper</b> — Your base adds ~50 min each way. Both days are built to absorb it: Day 1 stops are on the drive in, Day 2's Miette spur comes before the townsite.</div>
+        <div class="tip"><b>Miette Hot Springs season</b> — Typically open early May to mid-October. Confirm 2026 dates and hours at parks.canada.ca before relying on the soak.</div>
+        <div class="tip"><b>Maligne Lake timing</b> — Arriving ~3:30 PM means the easy lakeshore loop, not the Spirit Island cruise (last sailings are usually late afternoon and book out). Reserve ahead if you decide you want it.</div>
+        <div class="tip"><b>Wildlife</b> — Elk, deer, black + grizzly bears all active in July. Carry bear spray on Sulphur Skyline, keep distance, and drive slowly at dawn/dusk on Hwy 16.</div>
+        <div class="tip"><b>Gear</b> — Layers for the ridge (summit is windy + cool), 2L+ water, sun protection, swimsuit + quick-dry towel for Miette, bug spray for the valley.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Jasper National Park &nbsp;·&nbsp; parks.canada.ca/jasper &nbsp;·&nbsp; +1 780-852-6176</span>
+      <span>July 22–23, 2026</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof L === 'undefined') {
+    ['day1-map','day2-map'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#54595A">Map library failed to load. Check your internet connection and refresh.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(s){
+      L.marker([s.lat, s.lng], { icon: pin(s.color, s.label) })
+        .addTo(map)
+        .bindPopup('<b>' + s.name + '</b><br>' + s.desc);
+      bounds.push([s.lat, s.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    segments.forEach(function(seg){
+      var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
+                '?overview=full&geometries=geojson';
+
+      var placeholder = L.polyline(seg.points, {
+        color: seg.color, weight: 2, opacity: 0.25, dashArray: '4,6'
+      }).addTo(map);
+
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.routes || !data.routes[0]) return;
+          map.removeLayer(placeholder);
+          var line = data.routes[0].geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+          L.polyline(line, {
+            color: seg.color, weight: 3.5, opacity: 0.75, dashArray: seg.dash || null
+          }).addTo(map);
+        })
+        .catch(function(){ /* keep placeholder if routing fails */ });
+    });
+  }
+
+  // ── DAY 1 ──
+  buildMap('day1-map',
+    [
+      { name: 'Hampton Inn, Kamloops', lat: 50.6755, lng: -120.3408, label: 'S', color: '#939798', desc: 'Depart 7 AM' },
+      { name: 'Mount Robson',          lat: 53.0355, lng: -119.2289, label: '1', color: '#939798', desc: '12:30 PM · Lunch + views' },
+      { name: 'Medicine Lake',         lat: 52.8543, lng: -117.7572, label: '2', color: '#14797E', desc: '2:30 PM · Disappearing lake' },
+      { name: 'Maligne Lake',          lat: 52.6654, lng: -117.5345, label: '3', color: '#14797E', desc: '3:30 PM · Mary Schäffer Loop' },
+      { name: 'Downtown Jasper',       lat: 52.8746, lng: -118.0810, label: '4', color: '#C8932E', desc: '6:30 PM · Dinner on Connaught Dr' },
+      { name: 'Hinton (base)',         lat: 53.3990, lng: -117.5794, label: 'H', color: '#939798', desc: '130 Nickerson Ave' }
+    ],
+    [
+      { color: '#939798', points: [[50.6755,-120.3408], [53.0355,-119.2289]] },
+      { color: '#14797E', points: [[53.0355,-119.2289], [52.8543,-117.7572], [52.6654,-117.5345]] },
+      { color: '#C8932E', points: [[52.6654,-117.5345], [52.8746,-118.0810]] },
+      { color: '#939798', dash: '5,5', points: [[52.8746,-118.0810], [53.3990,-117.5794]] }
+    ]
+  );
+
+  // ── DAY 2 ──
+  buildMap('day2-map',
+    [
+      { name: 'Hinton (base)',     lat: 53.3990, lng: -117.5794, label: 'H', color: '#939798', desc: 'Depart 7 AM · 130 Nickerson Ave' },
+      { name: 'Miette Hot Springs',lat: 53.1316, lng: -117.7656, label: '1', color: '#3F6B8C', desc: '8:30 AM · Sulphur Skyline + soak' },
+      { name: 'Pyramid Lake',      lat: 52.9235, lng: -118.0988, label: '2', color: '#14797E', desc: '3:30 PM · Pyramid Island' }
+    ],
+    [
+      { color: '#3F6B8C', points: [[53.3990,-117.5794], [53.1316,-117.7656]] },
+      { color: '#14797E', points: [[53.1316,-117.7656], [52.9235,-118.0988]] },
+      { color: '#939798', dash: '5,5', points: [[52.9235,-118.0988], [53.3990,-117.5794]] }
+    ]
+  );
+});
+</script>
+</body>
+</html>

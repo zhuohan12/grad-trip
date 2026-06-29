@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Icefields Parkway — One-Day Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:      #F4F6F7;
+  --ink:        #16201F;
+  --ink-mid:    #51585A;
+  --ink-light:  #8E9698;
+  --border:     #D8DEDF;
+  --glacier:    #2E8FA8;
+  --ice:        #5FA8C4;
+  --falls:      #2E6E7E;
+  --meadow:     #4E7C4A;
+  --rock:       #7C6A52;
+  --hero-bg:    #0A1C24;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero { background: var(--hero-bg); padding: 3rem 3rem 2.5rem; position: relative; }
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(to right, #2E6E7E 0%, #2E8FA8 38%, #5FA8C4 68%, #4E7C4A 100%);
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #4F8DA0; margin-bottom: 0.75rem;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 600;
+  color: #E9EEF0; line-height: 1.08; letter-spacing: -0.5px; margin-bottom: 0.4rem;
+}
+.hero-subtitle {
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px;
+  color: #6AA4B6; margin-bottom: 1.75rem;
+}
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #7BABBC; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #437383; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: 0.01em; }
+.eco-falls  { background: rgba(46,110,126,0.45); color: #92C7D2; border: 1px solid rgba(60,140,160,0.4); }
+.eco-glacier{ background: rgba(46,143,168,0.42); color: #9AD3E2; border: 1px solid rgba(70,170,195,0.4); }
+.eco-canyon { background: rgba(124,106,82,0.4);  color: #CFBE9F; border: 1px solid rgba(150,130,100,0.42); }
+.eco-lake   { background: rgba(95,168,196,0.34); color: #B4DCE9; border: 1px solid rgba(95,168,196,0.45); }
+
+/* ── MAPS ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 1.75rem; }
+.map-block:last-child { margin-bottom: 0; }
+.map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; gap: 1rem; flex-wrap: wrap; }
+.map-label { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-light); }
+.gmaps-btn {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-mid);
+  text-decoration: none; padding: 5px 11px; border: 1px solid var(--border);
+  border-radius: 3px; background: #fff; transition: all 0.15s;
+}
+.gmaps-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map { width: 100%; height: 460px; border-radius: 4px; border: 1px solid var(--border); background: #DCE6E8; }
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.map-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+.map-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 10px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+
+/* ── DAY SECTIONS ── */
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem; border-bottom-width: 1.5px; border-bottom-style: solid;
+  border-color: var(--glacier); color: var(--glacier);
+}
+.day-num {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600;
+  line-height: 1; letter-spacing: -1.5px; padding-top: 2px; min-width: 48px;
+}
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date { font-size: 11.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-top: 3px; }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute; left: -2.25rem; top: 7px; width: 15px; height: 15px;
+  border-radius: 50%; border: 2.5px solid var(--paper); background: var(--border);
+}
+.dot-neutral { background: #8E9698; }
+.dot-falls   { background: var(--falls); }
+.dot-glacier { background: var(--glacier); }
+.dot-canyon  { background: var(--rock); }
+.dot-lake    { background: var(--ice); }
+.dot-meadow  { background: var(--meadow); }
+.stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
+.stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
+.tag-easy    { background: #DCEEF2; color: #134E5C; }
+.tag-hike    { background: #DFEFE0; color: #234E26; }
+.tag-warn    { background: #FDF0E6; color: #8B4410; }
+.tag-optional{ background: #ECEAE3; color: #5A5440; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 590px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+
+/* ── ECO DIVIDER ── */
+.eco-divider {
+  display: flex; align-items: center; gap: 10px; margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── TIPS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #E9EDEE; border-left: 4px solid var(--glacier); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.01em; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+
+/* ── WARNING BOX ── */
+.warning-box { margin-top: 2rem; padding: 1rem 1.25rem; background: #DCEEF2; border-left: 4px solid var(--glacier); font-size: 13px; color: #18434E; line-height: 1.6; }
+.warning-box b { color: #0C2E36; font-weight: 600; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 2rem; padding: 1rem 2.5rem 0; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-light);
+}
+
+/* ── PRINT ── */
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: white; }
+  .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stop { page-break-inside: avoid; }
+  .day-section { page-break-inside: avoid; }
+  .tips { page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Alberta &nbsp;·&nbsp; Highway 93 North</div>
+    <h1 class="hero-title">Icefields Parkway</h1>
+    <div class="hero-subtitle">Jasper to the Bow Valley — waterfalls, glaciers, and a turquoise crescendo</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>Friday, July 24, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>~230 km southbound · full day</div>
+      <div class="meta-item"><span class="meta-dot"></span>End: 160 Kananaskis Way, Canmore</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-falls">💦 Waterfalls</span>
+      <span class="eco-badge eco-glacier">🧊 Glaciers</span>
+      <span class="eco-badge eco-canyon">🪨 Canyons</span>
+      <span class="eco-badge eco-lake">💧 Turquoise lakes</span>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="maps-section">
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">July 24 · Southbound on Hwy 93</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=Athabasca+Falls,Jasper,AB&destination=160+Kananaskis+Way,Canmore,AB&waypoints=Sunwapta+Falls,AB|Tangle+Creek+Falls,AB|Toe+of+the+Athabasca+Glacier+Trailhead,AB|Mistaya+Canyon,AB|Peyto+Lake+Viewpoint,AB|Bow+Lake,AB&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#2E6E7E"></span>Waterfalls</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#2E8FA8"></span>Glacier</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#7C6A52"></span>Canyon</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#5FA8C4"></span>Lakes</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#51585A"></span>Canmore (overnight)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DAY -->
+    <div class="day-section">
+      <div class="day-header">
+        <div class="day-num">93</div>
+        <div class="day-info">
+          <div class="day-title">The full southbound run, Jasper to the Bow Valley</div>
+          <div class="day-date">Friday, July 24 · One of the world's great drives</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">7:30 AM</div>
+          <div class="stop-name">Set off early</div>
+          <div class="stop-desc">There is no fuel between Saskatchewan River Crossing and the ends of the Parkway — top up before you start and again at the Crossing if you're low. Pack lunch and plenty of water; services are minimal. Aim to be at Athabasca Falls before the first tour buses.</div>
+        </div>
+
+        <div class="eco-divider">Waterfalls · Upper Parkway</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-falls"></div>
+          <div class="stop-time">8:00 AM</div>
+          <div class="stop-name">Athabasca Falls</div>
+          <div class="stop-tags"><span class="tag tag-easy">Short walk</span></div>
+          <div class="stop-desc">The most powerful falls on the Parkway — not tall, but a huge volume of glacial meltwater forced through a narrow quartzite gorge. Paved walkways and bridges loop both sides. Go early; this is one of the busiest stops by mid-morning.</div>
+          <div class="stop-specs"><div class="spec">~1 km of paved loops &nbsp;·&nbsp; ~30 min &nbsp;·&nbsp; Easy</div></div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-falls"></div>
+          <div class="stop-time">9:00 AM</div>
+          <div class="stop-name">Sunwapta Falls</div>
+          <div class="stop-tags"><span class="tag tag-easy">Short walk</span></div>
+          <div class="stop-desc">Glacial water curves around a small island before dropping into a tight canyon. The upper falls are steps from the lot; a quiet 2 km round-trip trail leads to the less-crowded lower falls if you want to stretch. Café on site.</div>
+          <div class="stop-specs"><div class="spec">Upper falls 5 min &nbsp;·&nbsp; lower falls 2 km RT &nbsp;·&nbsp; ~30–45 min</div></div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-falls"></div>
+          <div class="stop-time">10:15 AM</div>
+          <div class="stop-name">Tangle Creek Falls</div>
+          <div class="stop-tags"><span class="tag tag-easy">Roadside</span></div>
+          <div class="stop-desc">A tiered roadside cascade right beside Hwy 93 — park across the road and shoot it in five minutes. Cross carefully; there's no crosswalk and traffic moves fast here.</div>
+          <div class="stop-specs"><div class="spec">Roadside &nbsp;·&nbsp; ~15 min</div></div>
+        </div>
+
+        <div class="eco-divider">Columbia Icefield · The high point</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-glacier"></div>
+          <div class="stop-time">10:45 AM</div>
+          <div class="stop-name">Toe of the Athabasca Glacier Trailhead</div>
+          <div class="stop-tags"><span class="tag tag-hike">Short hike</span><span class="tag tag-warn">Cold + windy</span></div>
+          <div class="stop-desc">Walk up the moraine toward the snout of the Athabasca Glacier, with interpretive markers showing how far the ice has retreated decade by decade — sobering and spectacular. Stay behind the barriers; the ice is unstable and hides crevasses. The Icefield Centre across the highway has lunch and restrooms, plus the optional Ice Explorer and Skywalk if you pre-booked.</div>
+          <div class="stop-specs"><div class="spec"><b>Forefield trail</b> &nbsp;~1.8 km RT &nbsp;·&nbsp; ~45 min &nbsp;·&nbsp; Easy–moderate, exposed</div></div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-meadow"></div>
+          <div class="stop-time">12:00 PM</div>
+          <div class="stop-name">Wilcox Pass (optional)</div>
+          <div class="stop-tags"><span class="tag tag-optional">If time + energy</span></div>
+          <div class="stop-desc">If you're ahead of schedule and want one real hike, the first 30–40 min of Wilcox Pass climbs to a red-chair viewpoint straight across from the Athabasca Glacier — arguably a better glacier view than the toe itself. Full pass is 8 km RT; turn around at the meadow if you just want the view. Bighorn sheep common.</div>
+          <div class="stop-specs"><div class="spec"><b>To the viewpoint</b> &nbsp;~3 km RT &nbsp;·&nbsp; ~1.5 hrs &nbsp;·&nbsp; Moderate</div></div>
+        </div>
+
+        <div class="eco-divider">Canyon + lakes · Lower Parkway</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">2:30 PM</div>
+          <div class="stop-name">Mistaya Canyon</div>
+          <div class="stop-tags"><span class="tag tag-hike">Short hike</span></div>
+          <div class="stop-desc">A 10-minute walk downhill from the lot leads to a narrow, twisting limestone slot carved by the Mistaya River — whirlpools, a natural arch, and foaming turquoise water. Remember the climb back up is the work. Just south of Saskatchewan River Crossing (last fuel + food).</div>
+          <div class="stop-specs"><div class="spec">~1 km RT &nbsp;·&nbsp; ~30–40 min &nbsp;·&nbsp; Short but steep return</div></div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">3:45 PM</div>
+          <div class="stop-name">Peyto Lake</div>
+          <div class="stop-tags"><span class="tag tag-easy">Short walk</span></div>
+          <div class="stop-desc">The wolf-head-shaped lake of every postcard — an electric glacial turquoise from the rock flour suspended in the meltwater. A paved 15-min walk from the Bow Summit lot leads to the upgraded viewing platform. Best light is midday-to-afternoon, so your timing is right.</div>
+          <div class="stop-specs"><div class="spec">~1.2 km RT to platform &nbsp;·&nbsp; ~45 min &nbsp;·&nbsp; Easy</div></div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-lake"></div>
+          <div class="stop-time">4:45 PM</div>
+          <div class="stop-name">Bow Lake</div>
+          <div class="stop-tags"><span class="tag tag-easy">Lakeshore</span></div>
+          <div class="stop-desc">A broad, calm lake at the foot of Bow Summit, quieter than Lake Louise and often more beautiful. Stroll the shoreline, or grab a coffee at Num-Ti-Jah Lodge's provisions counter. A gentle final stop before you leave the Parkway.</div>
+          <div class="stop-specs"><div class="spec">Lakeshore wander &nbsp;·&nbsp; ~45 min &nbsp;·&nbsp; Easy</div></div>
+        </div>
+
+        <div class="eco-divider">Off the Parkway</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">6:00 PM</div>
+          <div class="stop-name">Continue to Canmore</div>
+          <div class="stop-desc">Rejoin Hwy 93 south past Lake Louise, merge onto the Trans-Canada Hwy 1 east, and run down to 160 Kananaskis Way, Canmore. From Bow Lake it's roughly 1.5 hrs without stops (~140 km). Fuel up at Lake Louise village if you're low, and watch for wildlife at dusk on the Trans-Canada.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REALITY CHECK -->
+    <div class="warning-box">
+      <b>This is a stop-heavy day, not a hiking day.</b> &nbsp;Eight or nine pull-offs across ~230 km means the clock is your real constraint, not distance. The schedule front-loads the must-sees and treats Wilcox Pass as a pressure valve: skip it without guilt if you're behind. If you'd rather hike more and stop less, drop Tangle Creek and one of the falls and put that time into Wilcox.
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips">
+      <div class="tips-heading">Field notes &amp; logistics</div>
+      <div class="tips-grid">
+        <div class="tip"><b>Park pass</b> — The Parkway runs through Jasper + Banff National Parks; a valid Parks Canada pass is required and checked. Display it on the dash.</div>
+        <div class="tip"><b>Fuel</b> — Only reliable fuel is at the ends + Saskatchewan River Crossing. Start full; top up at the Crossing.</div>
+        <div class="tip"><b>Icefield add-ons</b> — The Ice Explorer + Skywalk sell out; pre-book online if you want them. They add ~2 hrs, so cut other stops if so.</div>
+        <div class="tip"><b>Weather</b> — The Icefield section is high and cold even in July; carry a warm layer + wind shell. Conditions change fast.</div>
+        <div class="tip"><b>Connectivity</b> — Cell coverage is patchy to nonexistent for most of the drive. Download offline maps before you leave.</div>
+        <div class="tip"><b>Wildlife</b> — Bighorn sheep, mountain goats, bears. Pull fully off the road for wildlife and never feed them. Slow down at dusk.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Icefields Parkway (Hwy 93N) &nbsp;·&nbsp; parks.canada.ca &nbsp;·&nbsp; Jasper + Banff National Parks</span>
+      <span>July 24, 2026</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof L === 'undefined') {
+    var el = document.getElementById('day1-map');
+    if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#51585A">Map library failed to load. Check your internet connection and refresh.</div>';
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(s){
+      L.marker([s.lat, s.lng], { icon: pin(s.color, s.label) })
+        .addTo(map)
+        .bindPopup('<b>' + s.name + '</b><br>' + s.desc);
+      bounds.push([s.lat, s.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    segments.forEach(function(seg){
+      var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
+                '?overview=full&geometries=geojson';
+
+      var placeholder = L.polyline(seg.points, {
+        color: seg.color, weight: 2, opacity: 0.25, dashArray: '4,6'
+      }).addTo(map);
+
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.routes || !data.routes[0]) return;
+          map.removeLayer(placeholder);
+          var line = data.routes[0].geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+          L.polyline(line, {
+            color: seg.color, weight: 3.5, opacity: 0.75, dashArray: seg.dash || null
+          }).addTo(map);
+        })
+        .catch(function(){ /* keep placeholder if routing fails */ });
+    });
+  }
+
+  // ── ICEFIELDS PARKWAY ──
+  buildMap('day1-map',
+    [
+      { name: 'Athabasca Falls',        lat: 52.6644, lng: -117.8838, label: '1', color: '#2E6E7E', desc: '8:00 AM · Powerful gorge falls' },
+      { name: 'Sunwapta Falls',         lat: 52.5323, lng: -117.6451, label: '2', color: '#2E6E7E', desc: '9:00 AM · Island + canyon drop' },
+      { name: 'Tangle Creek Falls',     lat: 52.2673, lng: -117.2865, label: '3', color: '#2E6E7E', desc: '10:15 AM · Roadside cascade' },
+      { name: 'Toe of the Athabasca Glacier', lat: 52.2126, lng: -117.2328, label: '4', color: '#2E8FA8', desc: '10:45 AM · Walk to the ice' },
+      { name: 'Wilcox Pass (optional)', lat: 52.2183, lng: -117.1848, label: '5', color: '#4E7C4A', desc: '12:00 PM · Optional glacier-view hike' },
+      { name: 'Mistaya Canyon',         lat: 51.9413, lng: -116.7176, label: '6', color: '#7C6A52', desc: '2:30 PM · Limestone slot canyon' },
+      { name: 'Peyto Lake',             lat: 51.7171, lng: -116.5076, label: '7', color: '#5FA8C4', desc: '3:45 PM · Wolf-head turquoise lake' },
+      { name: 'Bow Lake',               lat: 51.6713, lng: -116.4600, label: '8', color: '#5FA8C4', desc: '4:45 PM · Calm lakeshore finish' },
+      { name: 'Canmore (accommodation)',lat: 51.0884, lng: -115.3479, label: 'E', color: '#51585A', desc: '~7:30 PM · 160 Kananaskis Way' }
+    ],
+    [
+      { color: '#2E6E7E', points: [[52.6644,-117.8838], [52.5323,-117.6451], [52.2673,-117.2865]] },
+      { color: '#2E8FA8', points: [[52.2673,-117.2865], [52.2126,-117.2328], [52.2183,-117.1848]] },
+      { color: '#7C6A52', points: [[52.2183,-117.1848], [51.9413,-116.7176]] },
+      { color: '#5FA8C4', points: [[51.9413,-116.7176], [51.7171,-116.5076], [51.6713,-116.4600]] },
+      { color: '#51585A', dash: '5,5', points: [[51.6713,-116.4600], [51.0884,-115.3479]] }
+    ]
+  );
+});
+</script>
+</body>
+</html>

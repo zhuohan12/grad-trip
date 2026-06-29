@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glacier National Park — 3-Day Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper:    #F6F5F0;
+  --ink:      #1A1A1A;
+  --ink-mid:  #5A5855;
+  --ink-light:#9A9693;
+  --border:   #E0DCD4;
+  --road:     #2C6E8F;   /* Going-to-the-Sun / Highline alpine blue */
+  --ridge:    #3E7C5A;   /* Garden Wall meadow green */
+  --glacier:  #1B8A9C;   /* Grinnell glacial teal */
+  --gold:     #C8932E;   /* travel / arrival accent */
+  --hero-bg:  #0A1A22;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero { background: var(--hero-bg); padding: 3rem 3rem 2.5rem; position: relative; }
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: linear-gradient(to right, #3E7C5A 0%, #2C6E8F 38%, #1B8A9C 72%, #C8932E 100%);
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: #5C92A8; margin-bottom: 0.75rem;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 600;
+  color: #ECE8DF; line-height: 1.08; letter-spacing: -0.5px; margin-bottom: 0.4rem;
+}
+.hero-subtitle {
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px;
+  color: #6FA3B4; margin-bottom: 1.75rem;
+}
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #7FAAB8; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #46727F; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: 0.01em; }
+.eco-road    { background: rgba(44,110,143,0.45); color: #9CC6DA; border: 1px solid rgba(70,140,175,0.4); }
+.eco-ridge   { background: rgba(62,124,90,0.45);  color: #97CBAB; border: 1px solid rgba(80,150,110,0.4); }
+.eco-glacier { background: rgba(27,138,156,0.42); color: #8FD2DD; border: 1px solid rgba(45,165,185,0.4); }
+.eco-gold    { background: rgba(200,147,46,0.30); color: #E6C277; border: 1px solid rgba(200,147,46,0.45); }
+
+/* ── MAPS ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 1.75rem; }
+.map-block:last-child { margin-bottom: 0; }
+.map-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; gap: 1rem; flex-wrap: wrap; }
+.map-label { font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-light); }
+.gmaps-btn {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.04em; color: var(--ink-mid);
+  text-decoration: none; padding: 5px 11px; border: 1px solid var(--border);
+  border-radius: 3px; background: #fff; transition: all 0.15s;
+}
+.gmaps-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map { width: 100%; height: 360px; border-radius: 4px; border: 1px solid var(--border); background: #DCE6E8; }
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.map-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+.map-legend .lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px; height: 26px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+}
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+
+/* ── DAY SECTIONS ── */
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex; align-items: flex-start; gap: 14px; margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem; border-bottom-width: 1.5px; border-bottom-style: solid;
+}
+.arrival-day .day-header  { border-color: #C4C0BA;      color: #5A5855; }
+.depart-day .day-header   { border-color: #C4C0BA;      color: #5A5855; }
+.highline-day .day-header { border-color: var(--road);  color: var(--road); }
+.glacier-day .day-header  { border-color: var(--glacier); color: var(--glacier); }
+.day-num {
+  font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 600;
+  line-height: 1; letter-spacing: -1.5px; padding-top: 2px; min-width: 48px;
+}
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date { font-size: 11.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-top: 3px; }
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute; left: -2.25rem; top: 7px; width: 15px; height: 15px;
+  border-radius: 50%; border: 2.5px solid var(--paper); background: var(--border);
+}
+.dot-neutral { background: #9A9693; }
+.dot-road    { background: var(--road); }
+.dot-ridge   { background: var(--ridge); }
+.dot-glacier { background: var(--glacier); }
+.dot-gold    { background: var(--gold); }
+.dot-forest  { background: #3E7C5A; }
+.dot-pacific { background: #1A507A; }
+.stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
+.stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
+.tag-hike-a  { background: #DCE8F0; color: #1E4A63; }
+.tag-hike-g  { background: #D7EDF0; color: #0D4E58; }
+.tag-road    { background: #E2EFF6; color: #214A5F; }
+.tag-shuttle { background: #FBF0DC; color: #7A5518; }
+.tag-warn    { background: #FDF0E6; color: #8B4410; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 590px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+
+/* ── ECO DIVIDER ── */
+.eco-divider {
+  display: flex; align-items: center; gap: 10px; margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── TIPS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #ECEAE3; border-left: 4px solid var(--road); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.01em; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+
+/* ── REALITY CHECK ── */
+.warning-box { margin-top: 2rem; padding: 1rem 1.25rem; background: #FBF0DC; border-left: 4px solid var(--gold); font-size: 13px; color: #5A4418; line-height: 1.6; }
+.warning-box b { color: #3F2F0F; font-weight: 600; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 2rem; padding: 1rem 2.5rem 0; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink-light);
+}
+
+/* ── PRINT ── */
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: white; }
+  .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .stop, .day-section, .tips { page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Montana &nbsp;·&nbsp; Crown of the Continent</div>
+    <h1 class="hero-title">Glacier National Park</h1>
+    <div class="hero-subtitle">The Going-to-the-Sun Road, the Garden Wall, and a glacier at the end of the trail</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>Jul 28–31, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Base: Whitefish, MT</div>
+      <div class="meta-item"><span class="meta-dot"></span>Calgary → Seattle leg</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-road">🛣 Going-to-the-Sun Road</span>
+      <span class="eco-badge eco-ridge">🥾 Highline · Garden Wall</span>
+      <span class="eco-badge eco-glacier">🧊 Grinnell Glacier</span>
+      <span class="eco-badge eco-gold">🐻 Grizzly country</span>
+    </div>
+  </div>
+
+  <!-- MAPS -->
+  <div class="maps-section">
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 1 · Calgary → St Mary → Going-to-the-Sun Road → Whitefish</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=105B+Magnolia+Grove+SE,Calgary,AB&destination=902+Karrow+Ave,Whitefish,MT&waypoints=Chief+Mountain+Border+Crossing|St+Mary+Visitor+Center,MT|Logan+Pass+Visitor+Center,MT|West+Glacier,MT&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Calgary (start)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#9A9693"></span>Border / drive</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#2C6E8F"></span>Going-to-the-Sun Road</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 2 · Going-to-the-Sun Road + Highline</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=902+Karrow+Ave,Whitefish,MT&destination=902+Karrow+Ave,Whitefish,MT&waypoints=Apgar+Visitor+Center,West+Glacier,MT|Logan+Pass+Visitor+Center,MT|The+Loop,Going-to-the-Sun+Road,MT&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#2C6E8F"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Shuttle hub</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#3E7C5A"></span>Highline (trail)</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 3 · Whitefish → Many Glacier → Whitefish</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=902+Karrow+Ave,Whitefish,MT&destination=902+Karrow+Ave,Whitefish,MT&waypoints=East+Glacier+Park,MT|Babb,MT|Grinnell+Glacier+Trailhead,Montana&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day3-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#2C6E8F"></span>Base</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#9A9693"></span>Drive (south end)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1B8A9C"></span>Grinnell Glacier</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Day 4 · Whitefish → Seattle</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=902+Karrow+Ave,Whitefish,MT&destination=11522+87th+Ave+S,Seattle,WA&waypoints=Coeur+d'Alene,ID|Snoqualmie+Falls,WA&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day4-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#2C6E8F"></span>Whitefish (base)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Lunch stop</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1A507A"></span>Seattle (next base)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="content">
+
+    <!-- DAY 1 -->
+    <div class="day-section arrival-day">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <div class="day-title">Calgary to Whitefish · the Going-to-the-Sun Road</div>
+          <div class="day-date">Tuesday, Jul 28 · Travel day via the east entrance</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-gold"></div>
+          <div class="stop-time">7:30 AM</div>
+          <div class="stop-name">Depart Calgary — head for the east side</div>
+          <div class="stop-desc">Rather than the direct western route to Whitefish, go south through the Alberta plains toward the Chief Mountain crossing (~2.75–3 hrs via Hwy 2, Hwy 5 past Cardston, then the Chief Mountain Hwy / Hwy 6). This brings you to the east end of the Going-to-the-Sun Road so you can drive the whole thing on the way to base. Glacier sits in Mountain Time, same as Calgary — no clock change today. Fuel up before Cardston.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~10:30 AM</div>
+          <div class="stop-name">Chief Mountain border crossing</div>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Passports + US entry authorization</span>
+          </div>
+          <div class="stop-desc">A seasonal, high-alpine crossing on the edge of Waterton — one of the most scenic ports of entry in the country, open 7 AM–10 PM in summer. Have everyone's passport and US entry authorization (ESTA / visa under the Visa Waiver Program) ready, and declare any fresh food. Don't carry bear spray across — buy it on the US side. From here it's ~45 min down to St Mary.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-road"></div>
+          <div class="stop-time">~11:30 AM</div>
+          <div class="stop-name">St Mary · east entrance + lunch</div>
+          <div class="stop-desc">The eastern gateway to the park. Grab lunch and top up fuel in St Mary (there's no fuel on the road ahead), and have your park pass ready for the entrance station. This is where the Going-to-the-Sun Road begins.</div>
+        </div>
+
+        <div class="eco-divider">Going-to-the-Sun Road · east to west</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-road"></div>
+          <div class="stop-time">~12:15 PM</div>
+          <div class="stop-name">Drive the Going-to-the-Sun Road</div>
+          <div class="stop-tags">
+            <span class="tag tag-road">Scenic drive</span>
+            <span class="tag tag-warn">Slow, winding · 21-ft vehicle limit</span>
+          </div>
+          <div class="stop-desc">The dramatic east half first: along St Mary Lake to the Wild Goose Island overlook, then the Jackson Glacier Overlook — the one glacier you can see from the road — climbing to Logan Pass at the Continental Divide. Parking at the pass is capped at 3 hrs and often full midday, but you're just passing through (you'll be back tomorrow), so roll on if it's packed. Then the dizzying west descent past the Weeping Wall, Bird Woman Falls, and the Loop down to Lake McDonald. Budget ~3 hrs with stops; it's a slow 40-mph road and your SUV is well under the 21-ft limit.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>St Mary → West Glacier</b> &nbsp;~50 mi &nbsp;·&nbsp; ~2 hrs driving, ~3 hrs with viewpoints</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~3:30 PM</div>
+          <div class="stop-name">West Glacier · supply stop</div>
+          <div class="stop-desc">Off the road's west end. Stock up before the hiking days: bear spray (outdoor shops in Columbia Falls/Whitefish, or REI in Kalispell), groceries, and plenty of water. Bear spray can't fly, so this is your one window to buy it for the trip.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-road"></div>
+          <div class="stop-time">~4:30 PM</div>
+          <div class="stop-name">Check in · Whitefish</div>
+          <div class="stop-desc">~40 min from West Glacier to 902 Karrow Ave — your base for all three nights. Drop bags, then walk Central Avenue for dinner. Optional sunset at City Beach on Whitefish Lake. Make it an early night: tomorrow's shuttle and Highline are a long, full day.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day-section highline-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <div class="day-title">Going-to-the-Sun Road · Logan Pass · Highline Trail</div>
+          <div class="day-date">Wednesday, Jul 29 · Alpine traverse along the Garden Wall</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">8:00 AM</div>
+          <div class="stop-name">Slow start, depart Whitefish</div>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Shuttle ticket valid 10 AM onward</span>
+          </div>
+          <div class="stop-desc">No rush this morning — your shuttle isn't valid until 10 AM, so a relaxed breakfast and an 8 AM departure gets you to the West Glacier / Apgar entrance (~45 min) with time to spare. Park at the Apgar transit hub; private cars can't be left at Logan Pass for a full-day hike under the 2026 three-hour limit, which is why the hike runs off the shuttle.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~8:45 AM</div>
+          <div class="stop-name">Lake McDonald · short leg-loosener</div>
+          <div class="stop-desc">Fill the wait before your shuttle window with something flat and easy near Apgar: the coloured pebbles along the Lake McDonald shoreline, or the Trail of the Cedars loop (~1 mi) at Avalanche. Keep it short — save the legs for Highline. Back to the Apgar shuttle stop by ~9:45.</div>
+        </div>
+
+        <div class="eco-divider">Going-to-the-Sun Road · ride to the pass</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-road"></div>
+          <div class="stop-time">10:00 AM</div>
+          <div class="stop-name">Shuttle up the Going-to-the-Sun Road</div>
+          <div class="stop-tags">
+            <span class="tag tag-road">Scenic drive</span>
+            <span class="tag tag-shuttle">Ticketed · 10 AM</span>
+          </div>
+          <div class="stop-desc">Board at 10 AM, the start of your ticket window. The shuttle climbs the full western half of the Going-to-the-Sun Road — past Lake McDonald, up through the cliffs of the Garden Wall, over the Loop switchback to Logan Pass. Riding up is the road experience without anyone white-knuckling the wheel, and it solves the parking problem at the top. In 2026 the west-side route runs express (Apgar and Lake McDonald Lodge only, then Logan Pass), so budget ~1.5 hrs to the pass. The last downhill shuttle leaves Logan Pass at 7:30 PM and stops at The Loop, so your finish time has plenty of room.</div>
+        </div>
+
+        <div class="eco-divider">Highline Trail · the Garden Wall traverse</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-ridge"></div>
+          <div class="stop-time">~11:30 AM</div>
+          <div class="stop-name">Logan Pass → Highline Trail</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-a">Main hike</span>
+            <span class="tag tag-warn">Exposed ledge near the start</span>
+          </div>
+          <div class="stop-desc">From Logan Pass (6,646 ft) the trail begins with the famous narrow ledge below the Garden Wall — a hand cable bolted to the rock, a big drop to the road below, but wide enough and safe at a steady pace. It then undulates through alpine meadow to Haystack Pass (the main climb, ~3.5 mi), continues to Granite Park Chalet at 7.6 mi, then drops ~4 mi of switchbacks to The Loop. Mountain goats and bighorn sheep are common along the wall. An ~11:30 start has you finishing around 5:30 — well ahead of the 7:30 PM last shuttle — so the pace is relaxed, not rushed.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Highline · Logan Pass to The Loop</b> &nbsp;11.6 mi / 18 km point-to-point &nbsp;·&nbsp; ~1,450 ft / 440 m gain (net descent) &nbsp;·&nbsp; ~6 hrs &nbsp;·&nbsp; Moderate–strenuous</div>
+          </div>
+          <div class="stop-specs">
+            <div class="spec"><b>Grinnell Glacier Overlook spur</b> &nbsp;optional, steep &nbsp;·&nbsp; +1.2 mi / +1,000 ft RT &nbsp;·&nbsp; skip it — you're seeing the glacier up close tomorrow</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-road"></div>
+          <div class="stop-time">~5:30 PM</div>
+          <div class="stop-name">The Loop → shuttle back</div>
+          <div class="stop-tags">
+            <span class="tag tag-shuttle">Shuttle pickup</span>
+          </div>
+          <div class="stop-desc">Catch a downhill shuttle at The Loop back to Apgar, where the car is. Afternoon and evening shuttles stop here for descending Highline hikers; the last one off Logan Pass leaves at 7:30 PM and passes The Loop shortly after, so a ~5:30 arrival means a short wait, not a scramble. Just don't dawdle past the last bus — there's no other ride back to your car.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~6:30 PM</div>
+          <div class="stop-name">Drive back to Whitefish</div>
+          <div class="stop-desc">~45 min west to base. Later dinner on Central Avenue tonight given the shifted timing. Rest the legs — tomorrow is the bigger climb, and it starts very early.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="day-section glacier-day">
+      <div class="day-header">
+        <div class="day-num">03</div>
+        <div class="day-info">
+          <div class="day-title">Many Glacier · Grinnell Glacier Trail</div>
+          <div class="day-date">Thursday, Jul 30 · Turquoise lakes and the glacier basin</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">5:30 AM</div>
+          <div class="stop-name">Depart Whitefish — early</div>
+          <div class="stop-desc">Many Glacier is ~2.5–3 hrs away on the east side, via US-2 to East Glacier, then MT-49 and US-89 north to Babb, then Many Glacier Road in. The Going-to-the-Sun Road does not connect to Many Glacier — this long loop around the south end is the only road in, so the early start is unavoidable.</div>
+        </div>
+
+        <div class="eco-divider">Many Glacier · the east side</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-glacier"></div>
+          <div class="stop-time">~8:30 AM</div>
+          <div class="stop-name">Grinnell Glacier Trailhead</div>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Lot fills mid-morning</span>
+          </div>
+          <div class="stop-desc">Park between the Many Glacier Hotel and the Swiftcurrent Motor Inn. The 2025 construction is finished and parking expanded to 339 spaces for 2026, but the lot still fills by mid-morning on weekends — aim to arrive by 8:30. If it's full, use the larger Many Glacier Hotel lot and pick up the connector trail along Swiftcurrent Lake.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-glacier"></div>
+          <div class="stop-time">~9:00 AM</div>
+          <div class="stop-name">Grinnell Glacier Trail</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-g">Main hike</span>
+            <span class="tag tag-warn">Grizzly habitat — carry spray</span>
+          </div>
+          <div class="stop-desc">A flat 2 mi warm-up along Swiftcurrent Lake and Lake Josephine, then 2.5 mi of real climbing past a trailside waterfall (you walk under it — stash electronics), then a steep final mile of rocky steps to the glacier basin: a blue-green meltwater pool beneath the Garden Wall and the Continental Divide. Prime bear country, so make noise and keep the spray accessible. A $35 boat shuttle across the two lakes can trim ~3.5 mi off the round trip if anyone's legs are spent from Highline.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Grinnell Glacier · out-and-back</b> &nbsp;11 mi / 18 km RT &nbsp;·&nbsp; 2,600 ft / 790 m gain &nbsp;·&nbsp; ~6–7 hrs &nbsp;·&nbsp; Strenuous</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-glacier"></div>
+          <div class="stop-time">~1:00 PM</div>
+          <div class="stop-name">Lunch at the glacier basin</div>
+          <div class="stop-desc">Refuel at the top with the glacier and falls in front of you — there's a pit toilet and benches near the final switchback just below. Layer up: the wind coming off the ice is cold once you stop moving and the climb-sweat cools. Turn around when you're ready; it's the same trail back down.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~5:30 PM</div>
+          <div class="stop-name">Drive back to Whitefish</div>
+          <div class="stop-desc">~2.5–3 hrs back around to base. Dinner in Whitefish, then pack tonight — tomorrow is a long haul west to Seattle (checkout 11 AM).</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 4 -->
+    <div class="day-section depart-day">
+      <div class="day-header">
+        <div class="day-num">04</div>
+        <div class="day-info">
+          <div class="day-title">Whitefish to Seattle · the long drive west</div>
+          <div class="day-date">Friday, Jul 31 · Travel day · ~531 mi / ~8.5 hrs</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">8:00 AM</div>
+          <div class="stop-name">Depart Whitefish</div>
+          <div class="stop-desc">Checkout is 11 AM but leave earlier for the long day — head south past Flathead Lake to pick up I-90, which carries you almost the whole way. Two things ease it: it's nearly all interstate (no remote-fuel worries), and you gain an hour crossing into Pacific time, so you arrive earlier on the clock than the drive time suggests. Top up fuel in Kalispell on the way out.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-gold"></div>
+          <div class="stop-time">~11:30 AM</div>
+          <div class="stop-name">Coeur d'Alene, ID · lakeside lunch</div>
+          <div class="stop-desc">The natural break, ~3.5–4 hrs in: a resort town right on the lake, with waterfront spots a few minutes off the highway. Stretch the legs, refuel the car and yourselves. This is the prettiest stop of the drive.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">~1:00 PM</div>
+          <div class="stop-name">Spokane + central Washington</div>
+          <div class="stop-desc">Through Spokane, then the long flat-and-dry middle of the state — Moses Lake, Ritzville, Ellensburg. This is the monotonous stretch; swap drivers and settle in. Remember the clock falls back an hour at the Washington line.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-forest"></div>
+          <div class="stop-time">~4:00 PM PT</div>
+          <div class="stop-name">Snoqualmie Falls (optional)</div>
+          <div class="stop-tags">
+            <span class="tag tag-road">Quick stop</span>
+          </div>
+          <div class="stop-desc">A 268-ft waterfall just off I-90, about 30 min before the city — a good final leg-stretch and a proper PNW welcome. Skip it without guilt if everyone just wants to get in.</div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-pacific"></div>
+          <div class="stop-time">~5:00 PM PT</div>
+          <div class="stop-name">Arrive Seattle</div>
+          <div class="stop-desc">11522 87th Ave S — your South Seattle base. Even with the lunch and falls stops, the westward time gain lands you in by early evening. Grab groceries and an early dinner: tomorrow is the 5 AM start for Mount Rainier, so an early night matters.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REALITY CHECK -->
+    <div class="warning-box">
+      <b>Two big days back to back — and a long drive on either end.</b> &nbsp;Highline (18 km) and Grinnell (18 km, 2,600 ft) on consecutive days is a lot, especially bracketed by the Calgary drive in and the ~8.5 hr drive to Seattle on Jul 31. It's very doable for a fit group, but if anyone's worn out: take the Grinnell boat shuttle to cut the distance, or swap the Day 3 climb for the easier lakeshore + Josephine loop. And be honest about the Jul 31 → Aug 1 sequence: a full driving day straight into a 5 AM Rainier start is punishing — the Rainier plan has a lighter Paradise-only fallback if you need it.
+    </div>
+
+    <!-- TIPS -->
+    <div class="tips">
+      <div class="tips-heading">Field notes &amp; logistics</div>
+      <div class="tips-grid">
+        <div class="tip"><b>Entry pass</b> — An America the Beautiful pass ($80/yr) covers Glacier plus Rainier and Olympic later in your trip. No vehicle reservation is required anywhere in the park in 2026 — the timed-entry pilot was dropped.</div>
+        <div class="tip"><b>Logan Pass / Highline shuttle</b> — Your Jul 29 ticket is valid from 10 AM, so Highline starts ~11:30 and finishes The Loop ~5:30 PM. The last downhill shuttle leaves Logan Pass at 7:30 PM (stopping at The Loop), so you've got a ~2-hour buffer. There's no other way back to your car if you miss it. West-side route is express: Apgar and Lake McDonald Lodge only.</div>
+        <div class="tip"><b>Going-to-the-Sun Road</b> — You drive the east half on arrival (Jul 28) and ride the west half by shuttle on hike day (Jul 29) — the full road, no repeat. The alpine section opens late June / early July depending on snow; confirm it's fully open on the NPS Glacier "Current Conditions" page beforehand. Vehicles over 21 ft are barred between Avalanche and Rising Sun.</div>
+        <div class="tip"><b>Many Glacier access</b> — Open and normal for 2026 (2025 Swiftcurrent construction is done). No reservation needed, but arrive before ~8:30 AM on weekends. Snow can linger on Grinnell's final pitch into early summer — fine by late July.</div>
+        <div class="tip"><b>Bears</b> — Both trails cross prime grizzly habitat. Carry bear spray where you can reach it, hike in a group, and make noise on blind corners. Buy spray in Montana (you can't fly with it or bring it over the border).</div>
+        <div class="tip"><b>Gear &amp; weather</b> — Layers and a wind shell (frigid off the glacier and at the pass), 2L+ water each, sturdy boots, sun protection for the exposed Garden Wall, trekking poles for the Grinnell descent.</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Glacier National Park &nbsp;·&nbsp; nps.gov/glac &nbsp;·&nbsp; +1 406-888-7800 &nbsp;·&nbsp; base: Whitefish, MT</span>
+      <span>Jul 28–31, 2026</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', function(){
+  if (typeof L === 'undefined') {
+    ['day1-map','day2-map','day3-map','day4-map'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#5A5855">Map library failed to load. Check your internet connection and refresh.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14, attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(s){
+      L.marker([s.lat, s.lng], { icon: pin(s.color, s.label) })
+        .addTo(map)
+        .bindPopup('<b>' + s.name + '</b><br>' + s.desc);
+      bounds.push([s.lat, s.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    segments.forEach(function(seg){
+      var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
+      var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
+                '?overview=full&geometries=geojson';
+
+      var placeholder = L.polyline(seg.points, {
+        color: seg.color, weight: 2, opacity: 0.25, dashArray: '4,6'
+      }).addTo(map);
+
+      fetch(url)
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          if (!data.routes || !data.routes[0]) return;
+          map.removeLayer(placeholder);
+          var line = data.routes[0].geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+          L.polyline(line, {
+            color: seg.color, weight: 3.5, opacity: 0.75, dashArray: seg.dash || null
+          }).addTo(map);
+        })
+        .catch(function(){ /* keep placeholder if routing fails */ });
+    });
+  }
+
+  // ── DAY 1 · Calgary → St Mary → Going-to-the-Sun Road → Whitefish ──
+  buildMap('day1-map',
+    [
+      { name: 'Calgary',          lat: 50.8810, lng: -113.9600, label: 'S', color: '#C8932E', desc: 'Depart 7:30 AM · 105B Magnolia Grove SE' },
+      { name: 'Chief Mountain border', lat: 48.9986, lng: -113.6360, label: '1', color: '#9A9693', desc: '~10:30 AM · Passports + ESTA · 7 AM–10 PM' },
+      { name: 'St Mary',          lat: 48.7475, lng: -113.4375, label: '2', color: '#2C6E8F', desc: '~11:30 AM · East entrance + lunch' },
+      { name: 'Logan Pass',       lat: 48.6963, lng: -113.7180, label: '3', color: '#2C6E8F', desc: 'Going-to-the-Sun Road · Continental Divide' },
+      { name: 'West Glacier',     lat: 48.5286, lng: -113.9888, label: '4', color: '#2C6E8F', desc: '~3:30 PM · Supply stop' },
+      { name: 'Whitefish (base)', lat: 48.4108, lng: -114.3500, label: 'H', color: '#2C6E8F', desc: '~4:30 PM check-in · 902 Karrow Ave' }
+    ],
+    [
+      { color: '#9A9693', points: [
+        [50.8810,-113.9600], [48.9986,-113.6360], [48.7475,-113.4375]
+      ]},
+      { color: '#2C6E8F', points: [
+        [48.7475,-113.4375], [48.6963,-113.7180], [48.5286,-113.9888]
+      ]},
+      { color: '#9A9693', dash: '5,5', points: [
+        [48.5286,-113.9888], [48.4108,-114.3500]
+      ]}
+    ]
+  );
+
+  // ── DAY 2 · Going-to-the-Sun Road + Highline ──
+  buildMap('day2-map',
+    [
+      { name: 'Whitefish (base)', lat: 48.4108, lng: -114.3500, label: 'H', color: '#2C6E8F', desc: 'Depart 8 AM (shuttle valid 10 AM+)' },
+      { name: 'Apgar / West Glacier', lat: 48.5290, lng: -113.9910, label: '1', color: '#C8932E', desc: '10 AM · Board shuttle (Lake McDonald first)' },
+      { name: 'Logan Pass',       lat: 48.6963, lng: -113.7180, label: '2', color: '#3E7C5A', desc: '~11:30 AM · Highline trailhead (6,646 ft)' },
+      { name: 'Granite Park Chalet', lat: 48.7639, lng: -113.7269, label: '3', color: '#3E7C5A', desc: 'Highline · 7.6 mi in' },
+      { name: 'The Loop',         lat: 48.7430, lng: -113.7860, label: '4', color: '#C8932E', desc: '~5:30 PM · Shuttle to Apgar (last 7:30 PM)' }
+    ],
+    [
+      { color: '#9A9693', points: [[48.4108,-114.3500], [48.5290,-113.9910]] },
+      { color: '#2C6E8F', dash: '6,5', points: [[48.5290,-113.9910], [48.6963,-113.7180]] },
+      { color: '#3E7C5A', dash: '2,7', points: [[48.6963,-113.7180], [48.7639,-113.7269], [48.7430,-113.7860]] },
+      { color: '#9A9693', dash: '5,5', points: [[48.7430,-113.7860], [48.5290,-113.9910], [48.4108,-114.3500]] }
+    ]
+  );
+
+  // ── DAY 3 · Many Glacier / Grinnell ──
+  buildMap('day3-map',
+    [
+      { name: 'Whitefish (base)', lat: 48.4108, lng: -114.3500, label: 'H', color: '#2C6E8F', desc: 'Depart 5:30 AM' },
+      { name: 'East Glacier',     lat: 48.4458, lng: -113.2179, label: '1', color: '#9A9693', desc: 'US-2 around the south end' },
+      { name: 'Babb',             lat: 48.8519, lng: -113.4230, label: '2', color: '#9A9693', desc: 'US-89 · turn for Many Glacier' },
+      { name: 'Grinnell Glacier Trailhead', lat: 48.7971, lng: -113.6684, label: '3', color: '#1B8A9C', desc: '~8:30 AM · Many Glacier' }
+    ],
+    [
+      { color: '#9A9693', points: [
+        [48.4108,-114.3500], [48.4458,-113.2179], [48.8519,-113.4230], [48.7971,-113.6684]
+      ]},
+      { color: '#9A9693', dash: '5,5', points: [
+        [48.7971,-113.6684], [48.8519,-113.4230], [48.4458,-113.2179], [48.4108,-114.3500]
+      ]}
+    ]
+  );
+
+  // ── DAY 4 · Whitefish → Seattle ──
+  buildMap('day4-map',
+    [
+      { name: 'Whitefish (base)', lat: 48.4108, lng: -114.3500, label: 'H', color: '#2C6E8F', desc: 'Depart 8 AM · gain 1 hr going west' },
+      { name: "Coeur d'Alene, ID", lat: 47.6777, lng: -116.7805, label: '1', color: '#C8932E', desc: '~11:30 AM · Lakeside lunch' },
+      { name: 'Snoqualmie Falls',  lat: 47.5417, lng: -121.8377, label: '2', color: '#3E7C5A', desc: '~4 PM PT · Optional waterfall stop' },
+      { name: 'Seattle (next base)', lat: 47.5181, lng: -122.2580, label: 'E', color: '#1A507A', desc: '~5 PM PT · 11522 87th Ave S' }
+    ],
+    [
+      { color: '#9A9693', points: [
+        [48.4108,-114.3500], [47.9000,-114.0800], [47.6777,-116.7805]
+      ]},
+      { color: '#1A507A', points: [
+        [47.6777,-116.7805], [47.6588,-117.4260], [47.5417,-121.8377], [47.5181,-122.2580]
+      ]}
+    ]
+  );
+});
+</script>
+</body>
+</html>
