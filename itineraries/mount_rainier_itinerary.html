@@ -745,6 +745,14 @@ window.addEventListener('DOMContentLoaded', function(){
     map.fitBounds(bounds, { padding: [30, 30] });
 
     segments.forEach(function(seg){
+      // Ferry (and other non-driving) segments: draw a direct line, never route via roads.
+      if (seg.ferry) {
+        L.polyline(seg.points, {
+          color: seg.color, weight: 3.5, opacity: 0.85, dashArray: seg.dash || '2,8'
+        }).addTo(map);
+        return;
+      }
+
       var coords = seg.points.map(function(p){ return p[1] + ',' + p[0]; }).join(';');
       var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
                 '?overview=full&geometries=geojson';
@@ -809,7 +817,7 @@ window.addEventListener('DOMContentLoaded', function(){
     [
       { color: '#7A5CA8', points: [[47.2680,-122.4890], [47.6097,-122.3422]] },
       { color: '#C8932E', points: [[47.6097,-122.3422], [47.6027,-122.3384]] },
-      { color: '#C8932E', dash: '3,6', points: [[47.6027,-122.3384], [47.6229,-122.5108]] },
+      { color: '#C8932E', dash: '3,6', ferry: true, points: [[47.6027,-122.3384], [47.6229,-122.5108]] },
       { color: '#1A507A', points: [[47.6229,-122.5108], [47.7550,-122.6280], [48.0400,-123.1180], [48.1183,-123.4335]] }
     ]
   );
