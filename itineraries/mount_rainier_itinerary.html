@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mount Rainier — One-Day Itinerary</title>
+<title>Mount Rainier &amp; Seattle — 3-Day Itinerary</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -216,6 +216,9 @@ body {
 }
 
 .rainier-day .day-header { border-color: var(--alpine); color: var(--alpine); }
+.sunrise-day .day-header { border-color: var(--alpine); color: var(--alpine); }
+.paradise-day .day-header { border-color: var(--wildflower); color: var(--wildflower); }
+.city-day .day-header { border-color: #7A5CA8; color: #7A5CA8; }
 
 .day-num {
   font-family: 'Playfair Display', serif;
@@ -285,6 +288,8 @@ body {
 .dot-alpine  { background: var(--alpine); }
 .dot-golden  { background: var(--golden); }
 .dot-forest  { background: var(--forest); }
+.dot-city    { background: #7A5CA8; }
+.dot-coast   { background: #1A507A; }
 
 .stop-time {
   font-size: 11px;
@@ -324,6 +329,8 @@ body {
 .tag-hike-a  { background: #DCE6F0; color: #1F3F58; }
 .tag-warn    { background: #FDF0E6; color: #8B4410; }
 .tag-permit  { background: #FBF0DC; color: #7A5518; }
+.tag-city    { background: #E9E2F4; color: #4A3670; }
+.tag-ferry   { background: #DDEBF2; color: #1A4A66; }
 
 .stop-desc {
   font-size: 13.5px;
@@ -427,70 +434,158 @@ body {
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-eyebrow">Washington State &nbsp;·&nbsp; Cascade Range</div>
-    <h1 class="hero-title">Mount Rainier</h1>
-    <div class="hero-subtitle">One day, two peaks, a 14,411-ft volcano between</div>
+    <div class="hero-eyebrow">Washington State &nbsp;·&nbsp; Cascades &amp; Puget Sound</div>
+    <h1 class="hero-title">Mount Rainier &amp; Seattle</h1>
+    <div class="hero-subtitle">Two sides of a 14,411-ft volcano, a city evening, and a ferry to the peninsula</div>
     <div class="hero-meta">
-      <div class="meta-item"><span class="meta-dot"></span>Saturday, Aug 1, 2026</div>
-      <div class="meta-item"><span class="meta-dot"></span>From: South Seattle (87th Ave S)</div>
-      <div class="meta-item"><span class="meta-dot"></span>~280 mi · ~9 hrs driving + hiking</div>
+      <div class="meta-item"><span class="meta-dot"></span>Aug 1–3, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Base: Tacoma (N Mullen St)</div>
+      <div class="meta-item"><span class="meta-dot"></span>Spokane → Port Angeles leg</div>
     </div>
     <div class="eco-strip">
-      <span class="eco-badge eco-wild">🌸 Wildflower meadows</span>
-      <span class="eco-badge eco-alpine">⛰ Alpine ridges</span>
-      <span class="eco-badge eco-glacier">🏔 Glacier views</span>
-      <span class="eco-badge eco-warn">⚡ Big day</span>
+      <span class="eco-badge eco-alpine">⛰ Sunrise ridges</span>
+      <span class="eco-badge eco-wild">🌸 Paradise wildflowers</span>
+      <span class="eco-badge eco-glacier">🏙 Seattle evening</span>
+      <span class="eco-badge eco-warn">⛴ Bainbridge ferry</span>
     </div>
   </div>
 
   <!-- MAPS -->
   <div class="maps-section">
+
     <div class="map-block">
       <div class="map-header">
-        <div class="map-label">Aug 1 · Paradise → Sunrise Loop</div>
+        <div class="map-label">Aug 1 · Spokane → Chinook Pass → Sunrise → Tacoma</div>
         <a class="gmaps-btn" target="_blank" rel="noopener"
-           href="https://www.google.com/maps/dir/?api=1&origin=11522+87th+Ave+S,Seattle,WA&destination=11522+87th+Ave+S,Seattle,WA&waypoints=Paradise+Visitor+Center,Mount+Rainier+National+Park|Sunrise+Visitor+Center,Mount+Rainier+National+Park&travelmode=driving">Open in Google Maps</a>
+           href="https://www.google.com/maps/dir/?api=1&origin=417+West+Barnes+Road,Spokane,WA+99218&destination=3918+North+Mullen+Street,Tacoma,WA+98407&waypoints=Tipsoo+Lake,WA|Sunrise+Visitor+Center,Mount+Rainier+National+Park&travelmode=driving">Open in Google Maps</a>
       </div>
       <div id="day1-map" class="trip-map"></div>
       <div class="map-legend">
-        <div class="lg-item"><span class="lg-dot" style="background:#5A5855"></span>Home</div>
-        <div class="lg-item"><span class="lg-dot" style="background:#B8336A"></span>Paradise (south)</div>
-        <div class="lg-item"><span class="lg-dot" style="background:#3F6B8C"></span>Sunrise (north)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#5A5855"></span>Spokane (start)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#3F6B8C"></span>Sunrise (NE side)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#7A5CA8"></span>Tacoma (base)</div>
       </div>
     </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Aug 2 · Tacoma → Paradise → Seattle → Tacoma</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=3918+North+Mullen+Street,Tacoma,WA+98407&destination=3918+North+Mullen+Street,Tacoma,WA+98407&waypoints=Paradise+Visitor+Center,Mount+Rainier+National+Park|Pike+Place+Market,Seattle,WA&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#7A5CA8"></span>Tacoma (base)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#B8336A"></span>Paradise (south)</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Seattle (dinner)</div>
+      </div>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">Aug 3 · Tacoma → Seattle → Bainbridge ferry → Port Angeles</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&origin=3918+North+Mullen+Street,Tacoma,WA+98407&destination=Port+Angeles,WA&waypoints=Pike+Place+Market,Seattle,WA|Seattle+Ferry+Terminal+Colman+Dock,WA|Bainbridge+Island+Ferry+Terminal,WA&travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day3-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#7A5CA8"></span>Tacoma / Seattle</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#C8932E"></span>Ferry crossing</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#1A507A"></span>Port Angeles</div>
+      </div>
+    </div>
+
   </div>
 
   <div class="content">
 
     <!-- DAY 1 -->
-    <div class="day-section rainier-day">
+    <!-- DAY 1 · SUNRISE -->
+    <div class="day-section sunrise-day">
       <div class="day-header">
         <div class="day-num">01</div>
         <div class="day-info">
-          <div class="day-title">Skyline Trail · Mount Fremont Lookout</div>
-          <div class="day-date">Saturday, Aug 1 · Wildflowers + alpine ridges</div>
+          <div class="day-title">Spokane to Tacoma, over Chinook Pass to Sunrise</div>
+          <div class="day-date">Saturday, Aug 1 · Long scenic drive + an alpine ridge hike</div>
         </div>
       </div>
       <div class="timeline">
 
         <div class="stop">
           <div class="stop-dot dot-neutral"></div>
-          <div class="stop-time">5:00 AM</div>
-          <div class="stop-name">Depart South Seattle</div>
-          <div class="stop-desc">~2 hrs to the Nisqually entrance via I-5 south → SR-512 → SR-7 → SR-706. Fill up on petrol before SR-7 — gas stations thin out past Elbe. Pack lunch, water (3L+ per person), sunscreen, layers. The mountain is a 14,411-ft weather generator; pack a wind shell even if Seattle is clear.</div>
+          <div class="stop-time">6:00 AM</div>
+          <div class="stop-name">Depart Spokane</div>
+          <div class="stop-desc">It's a big driving day — ~290 mi / ~5.5 hrs to Sunrise — so get rolling early. Take I-90 west across the Columbia Plateau to Ellensburg (~2.5 hrs), then drop toward Yakima and pick up SR-410, the Chinook Pass Highway. Both Spokane and Tacoma are on Pacific time, so no clock change today. Fuel up in Ellensburg or Naches; there's none in the park, and Packwood is the nearest pump to Sunrise. Pack lunch, 3L+ water each, sunscreen and a wind shell — the mountain makes its own weather at 14,411 ft.</div>
+        </div>
+
+        <div class="eco-divider">Chinook Pass · the eastern gateway</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-golden"></div>
+          <div class="stop-time">~10:30 AM</div>
+          <div class="stop-name">Chinook Pass &amp; Tipsoo Lake</div>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Seasonal road — open summer only</span>
+          </div>
+          <div class="stop-desc">SR-410 climbs to 5,430 ft at Chinook Pass, cresting right at the park's east boundary. Tipsoo Lake sits just below — a subalpine tarn that mirrors Rainier, ringed by wildflowers in early August. It's the perfect leg-stretch and the first knockout view of the peak. Chinook Pass closes all winter and reopened for the season on May 22, 2026, so it's well open now; still worth a glance at the WSDOT pass report the night before.</div>
+        </div>
+
+        <div class="eco-divider">Sunrise · Alpine ridges + glacier views</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-alpine"></div>
+          <div class="stop-time">~11:30 AM</div>
+          <div class="stop-name">Sunrise · Mount Fremont Fire Lookout</div>
+          <div class="stop-tags">
+            <span class="tag tag-hike-a">Main hike</span>
+          </div>
+          <div class="stop-desc">From the pass it's ~45 min down and around to the White River Entrance and up the Sunrise Road to 6,400 ft — the highest point in the park you can drive to. Eat a quick lunch at the visitor center, then take the lookout trail through Sourdough Ridge wildflowers to a 1930s fire lookout at 7,317 ft: a panorama of Rainier's north face, the Emmons Glacier (largest by area in the lower 48), and Mount Baker on a clear day. Marmots and mountain goats are common; the ridgeline is fully exposed, so sun protection is essential. Short on energy after the drive? The easy Sourdough Ridge nature trail or the 1.5 mi Sunrise Rim loop give the same views for a fraction of the effort.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Mount Fremont Lookout Trail</b> &nbsp;5.6 mi RT &nbsp;·&nbsp; 900 ft gain &nbsp;·&nbsp; ~3 hrs &nbsp;·&nbsp; Moderate</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">~4:00 PM</div>
+          <div class="stop-name">Drive down to Tacoma</div>
+          <div class="stop-desc">Back down the Sunrise Road to SR-410 and out the northwest side through Greenwater and Enumclaw, then SR-410 → SR-167 / SR-512 into Tacoma. ~2 to 2.5 hrs. Check in at 3918 North Mullen Street — your base for the next two nights — and grab dinner in Tacoma's Proctor or Sixth Ave district. Tomorrow's Paradise start is much gentler than the old 5 AM plan.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Sunrise → Tacoma</b> &nbsp;~90 mi &nbsp;·&nbsp; ~2–2.5 hrs</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 2 · PARADISE + SEATTLE -->
+    <div class="day-section paradise-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <div class="day-title">Paradise &amp; the Skyline Trail, then a Seattle evening</div>
+          <div class="day-date">Sunday, Aug 2 · Wildflower meadows + city dinner</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">6:30 AM</div>
+          <div class="stop-name">Depart Tacoma for the Nisqually entrance</div>
+          <div class="stop-desc">~1.5 hrs to Paradise via SR-7 through Elbe, then SR-706 to the Nisqually Entrance and up to the Paradise lot. Leave early — Nisqually is the busiest gate and the entry line and Paradise parking both fill by mid-morning in August. Fill up before Elbe; the gas station outside Ashford is the last one. Pack the same layers and water as yesterday.</div>
         </div>
 
         <div class="eco-divider">Paradise · Subalpine wildflower meadows</div>
 
         <div class="stop">
           <div class="stop-dot dot-wild"></div>
-          <div class="stop-time">7:00 AM</div>
-          <div class="stop-name">Paradise · Skyline Trail</div>
+          <div class="stop-time">~8:00 AM</div>
+          <div class="stop-name">Paradise · Skyline Trail loop</div>
           <div class="stop-tags">
             <span class="tag tag-hike-w">Main hike</span>
-            <span class="tag tag-permit">Timed entry</span>
           </div>
-          <div class="stop-desc">Early August is peak wildflower bloom at 5,400 ft — lupine, paintbrush, avalanche lily, and pasqueflower in full colour across the meadows. The Skyline Loop climbs to Panorama Point with the Tatoosh Range to the south and Rainier's south face filling the sky north. Counter-clockwise direction is the classic — saves the steepest climb for fresher legs.</div>
+          <div class="stop-desc">Early August is peak bloom at 5,400 ft — lupine, paintbrush, avalanche lily and pasqueflower across the meadows. The Skyline Loop climbs to Panorama Point with the Tatoosh Range to the south and Rainier's south face filling the sky to the north. Go counter-clockwise to save the steepest pitch for fresher legs, and start early for cool air, parking, and the meadows to yourself before the crowds.</div>
           <div class="stop-specs">
             <div class="spec"><b>Skyline Trail loop</b> &nbsp;5.5 mi &nbsp;·&nbsp; 1,700 ft gain &nbsp;·&nbsp; ~3.5 hrs &nbsp;·&nbsp; Moderate–strenuous</div>
           </div>
@@ -498,39 +593,87 @@ body {
 
         <div class="stop">
           <div class="stop-dot dot-neutral"></div>
-          <div class="stop-time">11:30 AM</div>
-          <div class="stop-name">Lunch + drive to Sunrise</div>
-          <div class="stop-desc">Quick lunch at the Paradise Inn or in the car. Drive east on Stevens Canyon Road → Hwy 123 north → Hwy 410 north to the Sunrise turnoff. ~1.5–2 hrs depending on construction and traffic. Stevens Canyon has multiple worthwhile pull-offs (Reflection Lakes, Box Canyon) — skip them today, save for a future trip.</div>
+          <div class="stop-time">~12:30 PM</div>
+          <div class="stop-name">Lunch + optional Paradise wander</div>
+          <div class="stop-desc">Lunch at the Paradise Inn or a picnic below the meadows. If anyone wants more, the short Nisqually Vista or Myrtle Falls strolls are gentle add-ons. Then start north — you're trading the mountain for the city this afternoon.</div>
         </div>
 
-        <div class="eco-divider">Sunrise · Alpine ridges + glacier views</div>
+        <div class="eco-divider">Down the mountain · up to Seattle</div>
 
         <div class="stop">
-          <div class="stop-dot dot-alpine"></div>
-          <div class="stop-time">2:00 PM</div>
-          <div class="stop-name">Sunrise · Mount Fremont Fire Lookout</div>
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">~5:00 PM</div>
+          <div class="stop-name">Seattle · dinner in the city</div>
           <div class="stop-tags">
-            <span class="tag tag-hike-a">Main hike</span>
-            <span class="tag tag-permit">Timed entry</span>
+            <span class="tag tag-city">City evening</span>
           </div>
-          <div class="stop-desc">Sunrise sits at 6,400 ft — the highest point in the park you can drive to. The lookout trail climbs through Sourdough Ridge wildflowers to a 1930s fire lookout perched at 7,317 ft with a panoramic view of Rainier's north face, the Emmons Glacier (largest glacier by area in the lower 48), and on a clear day, Mount Baker. Mountain goats and marmots common. Ridgeline is fully exposed — sun protection essential.</div>
-          <div class="stop-specs">
-            <div class="spec"><b>Mount Fremont Lookout Trail</b> &nbsp;5.6 mi RT &nbsp;·&nbsp; 900 ft gain &nbsp;·&nbsp; ~3 hrs &nbsp;·&nbsp; Moderate</div>
-          </div>
-        </div>
-
-        <div class="stop">
-          <div class="stop-dot dot-golden"></div>
-          <div class="stop-time">5:30 PM</div>
-          <div class="stop-name">Golden hour at Sunrise</div>
-          <div class="stop-desc">Linger 30 min at the Sunrise Visitor Center deck or wander the easy 1.5 mi Sunrise Rim Trail for last light on the Emmons Glacier. August sunset is around 8:35 PM but you'll want to be back on the road by 6 PM to reach Seattle by 9 PM.</div>
+          <div class="stop-desc">~2.5 hrs from Paradise back down SR-706 → SR-7 → I-5 north (you'll pass Tacoma on the way up). Aim for an early evening in Seattle: Pike Place Market, the waterfront, and dinner downtown or in Belltown. Cap it with the view from Kerry Park across to the skyline and Rainier if it's out. A relaxed counterpoint to two hard hiking days.</div>
         </div>
 
         <div class="stop">
           <div class="stop-dot dot-neutral"></div>
-          <div class="stop-time">6:00 PM</div>
-          <div class="stop-name">Drive home</div>
-          <div class="stop-desc">Hwy 410 west through Enumclaw, then SR-164 → SR-18 → I-5 north back to South Seattle. ~2.5 hrs. Dinner stop in Enumclaw if you didn't pack one.</div>
+          <div class="stop-time">~9:00 PM</div>
+          <div class="stop-name">Back to Tacoma</div>
+          <div class="stop-desc">~40 min south on I-5 to the Mullen Street base for the second night. Keeping the room in Tacoma means no packing tonight — an easy end to the day.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DAY 3 · SEATTLE + FERRY -->
+    <div class="day-section city-day">
+      <div class="day-header">
+        <div class="day-num">03</div>
+        <div class="day-info">
+          <div class="day-title">Seattle morning, then the ferry to the peninsula</div>
+          <div class="day-date">Monday, Aug 3 · City half-day + Bainbridge crossing to Port Angeles</div>
+        </div>
+      </div>
+      <div class="timeline">
+
+        <div class="stop">
+          <div class="stop-dot dot-neutral"></div>
+          <div class="stop-time">8:30 AM</div>
+          <div class="stop-name">Check out, drive up to Seattle</div>
+          <div class="stop-desc">Load the car and head ~40 min north on I-5 into Seattle. Today is deliberately light — a half-day in the city, then a scenic ferry west to start the Olympic leg by evening.</div>
+        </div>
+
+        <div class="eco-divider">Seattle · a half-day in the city</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">~9:30 AM</div>
+          <div class="stop-name">Morning in Seattle</div>
+          <div class="stop-tags">
+            <span class="tag tag-city">City time</span>
+          </div>
+          <div class="stop-desc">Pick a couple of highlights rather than rushing all of them: Pike Place Market at its liveliest in the morning, the waterfront and the Seattle Aquarium, the Chihuly Garden and Glass or Space Needle at Seattle Center, or coffee and a wander through Pioneer Square. Grab an early lunch so you're at the ferry terminal with time to spare.</div>
+        </div>
+
+        <div class="eco-divider">Puget Sound · the crossing west</div>
+
+        <div class="stop">
+          <div class="stop-dot dot-golden"></div>
+          <div class="stop-time">~1:30 PM</div>
+          <div class="stop-name">Seattle → Bainbridge Island ferry</div>
+          <div class="stop-tags">
+            <span class="tag tag-ferry">Car ferry</span>
+            <span class="tag tag-warn">Arrive early to load</span>
+          </div>
+          <div class="stop-desc">Drive onto the Washington State Ferry at Colman Dock (Pier 52) for the 35-minute sailing to Bainbridge Island — one of the best cheap views in the country, with the skyline shrinking behind you and the Olympics rising ahead. Fares are collected westbound only. Summer sailings are frequent but fill with vehicles, so join the car queue ~45–60 min ahead; check current times at wsdot.wa.gov/ferries.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Colman Dock → Bainbridge</b> &nbsp;~35 min sailing</div>
+          </div>
+        </div>
+
+        <div class="stop">
+          <div class="stop-dot dot-coast"></div>
+          <div class="stop-time">~4:30 PM</div>
+          <div class="stop-name">Bainbridge → Port Angeles</div>
+          <div class="stop-desc">Off the boat, it's ~2 hrs west via SR-305 → SR-3 → SR-104 across the Hood Canal Bridge, then US-101 along the strait into Port Angeles — your base for all three Olympic nights. Arrive early evening, drop the bags, and grab dinner on Front Street. The Olympic leg picks up from here, with Hurricane Ridge stargazing an option tonight if the road's open.</div>
+          <div class="stop-specs">
+            <div class="spec"><b>Bainbridge → Port Angeles</b> &nbsp;~70 mi &nbsp;·&nbsp; ~2 hrs</div>
+          </div>
         </div>
 
       </div>
@@ -538,28 +681,29 @@ body {
 
     <!-- REALITY CHECK -->
     <div class="warning-box">
-      <b>Be honest with yourself about this day.</b> &nbsp;Two separate hikes totalling 11 miles and 2,600 ft of gain, bracketed by 4.5 hrs of driving. It's doable but punishing. If you'd rather not start at 5 AM: drop Mount Fremont and just do Paradise + Skyline, returning via the same route — saves ~3 hrs. Or split into two days with an overnight in Ashford or Packwood between Paradise and Sunrise.
+      <b>The load is the driving, not the hiking now.</b> &nbsp;Splitting Rainier across two mornings — Sunrise on Aug 1, Paradise on Aug 2 — means each hike is a manageable ~5.5 mi rather than the old back-to-back 11-mile day. The catch is Aug 1's ~5.5 hr drive from Spokane <em>before</em> you hike, so leave by 6 AM, keep the Sunrise hike flexible (Mount Fremont if fresh, the Sourdough/Rim loops if not), and don't stack a big evening on top. Aug 2 and 3 are easy by comparison. One thing to lock in: Aug 3's westbound ferry fills with cars in summer, so build in the 45–60 min car-queue buffer or you'll wait for the next sailing and reach Port Angeles late.
     </div>
 
     <!-- TIPS -->
     <div class="tips">
       <div class="tips-heading">Field notes &amp; logistics</div>
       <div class="tips-grid">
-        <div class="tip"><b>Timed entry permits</b> — Required summer 2026 for both Paradise and Sunrise corridors. Book at recreation.gov 60 days in advance, or 7 days ahead for next-day slots. $2 reservation fee per vehicle.</div>
-        <div class="tip"><b>Entry pass</b> — America the Beautiful pass ($80/yr) covers MORA + all US national parks. Or $30 vehicle pass at the gate.</div>
-        <div class="tip"><b>Sunrise Road dates</b> — Typically opens late June, closes mid-October. Confirm at nps.gov/mora before the trip.</div>
+        <div class="tip"><b>Timed entry (2026)</b> — Mount Rainier is <em>not</em> running timed-entry reservations in 2026, so no advance permit is needed. The trade-off is long entry lines: expect 60+ min waits at Nisqually and 30–60 min for Sunrise between roughly 8 AM and 4 PM in July–August. Both of our starts are early to beat them. Always re-check nps.gov/mora before the trip in case the policy changes.</div>
+        <div class="tip"><b>Entry pass</b> — America the Beautiful pass ($80/yr) covers MORA + all US national parks. Or $35 vehicle pass at the gate (card only on-site; fastest to pre-pay online).</div>
+        <div class="tip"><b>Chinook Pass (SR-410)</b> — The scenic eastern approach from Spokane, closed all winter and reopened May 22, 2026 for the season. Confirm it's open on the WSDOT mountain pass report and the NPS road-status page the night before.</div>
+        <div class="tip"><b>Sunrise Road dates</b> — Typically opens early July, closes early–mid October (highest road in the park, so snow lingers). Confirm at nps.gov/mora before the trip.</div>
+        <div class="tip"><b>Bainbridge ferry (Aug 3)</b> — Washington State Ferries, Seattle Colman Dock → Bainbridge, ~35 min. Fares collected westbound only; vehicles fill in summer, so join the car queue 45–60 min early. Live times at wsdot.wa.gov/ferries.</div>
         <div class="tip"><b>Wildflower timing</b> — Early August is peak Paradise bloom; Sunrise blooms 1–2 weeks later. You're hitting both at strong-to-peak.</div>
-        <div class="tip"><b>Weather</b> — Rainier makes its own clouds. Check the NWS Mount Rainier Recreation Forecast morning-of. Bring a wind shell + warm layer even if Seattle is hot.</div>
+        <div class="tip"><b>Weather</b> — Rainier makes its own clouds. Check the NWS Mount Rainier Recreation Forecast morning-of. Bring a wind shell + warm layer even if the lowlands are hot.</div>
         <div class="tip"><b>Altitude</b> — Sunrise is 6,400 ft, Mount Fremont 7,317 ft. Not high enough for sickness but expect to feel mildly winded. Hydrate aggressively.</div>
-        <div class="tip"><b>Gear</b> — Sun hat, SPF 50+, sunglasses (snow + glacier glare), 3L water, trekking poles for Skyline descent, layers.</div>
-        <div class="tip"><b>Wildlife</b> — Marmots, mountain goats, black bear. Goats can be aggressive — keep 50 yds. Don't feed marmots; they're salt-conditioned to backpacks.</div>
+        <div class="tip"><b>Gear &amp; wildlife</b> — Sun hat, SPF 50+, sunglasses, 3L water, trekking poles for the Skyline descent, layers. Marmots, mountain goats and black bear about — keep 50 yds from goats and never feed the marmots.</div>
       </div>
     </div>
 
     <!-- FOOTER -->
     <div class="footer">
-      <span>Mount Rainier National Park &nbsp;·&nbsp; nps.gov/mora &nbsp;·&nbsp; +1 360-569-2211</span>
-      <span>Aug 1, 2026</span>
+      <span>Mount Rainier National Park &nbsp;·&nbsp; nps.gov/mora &nbsp;·&nbsp; +1 360-569-2211 &nbsp;·&nbsp; base: Tacoma, WA</span>
+      <span>Aug 1–3, 2026</span>
     </div>
 
   </div>
@@ -568,8 +712,10 @@ body {
 <script>
 window.addEventListener('DOMContentLoaded', function(){
   if (typeof L === 'undefined') {
-    var el = document.getElementById('day1-map');
-    if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#5A5855">Map library failed to load. Check your internet connection and refresh.</div>';
+    ['day1-map','day2-map','day3-map'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#5A5855">Map library failed to load. Check your internet connection and refresh.</div>';
+    });
     return;
   }
 
@@ -621,17 +767,50 @@ window.addEventListener('DOMContentLoaded', function(){
     });
   }
 
-  // ── AUG 1 ──
+  // ── AUG 1 · Spokane → Chinook Pass → Sunrise → Tacoma ──
   buildMap('day1-map',
     [
-      { name: 'Home · South Seattle',     lat: 47.5181, lng: -122.2580, label: 'H', color: '#5A5855', desc: 'Depart 5 AM · Return ~9 PM' },
-      { name: 'Paradise',                 lat: 46.7866, lng: -121.7359, label: '1', color: '#B8336A', desc: '7 AM · Skyline Trail loop' },
-      { name: 'Sunrise',                  lat: 46.9145, lng: -121.6428, label: '2', color: '#3F6B8C', desc: '2 PM · Mount Fremont Lookout' }
+      { name: 'Spokane',        lat: 47.7560, lng: -117.4050, label: 'S', color: '#5A5855', desc: 'Depart 6 AM · 417 West Barnes Rd' },
+      { name: 'Tipsoo Lake / Chinook Pass', lat: 46.8697, lng: -121.5183, label: '1', color: '#C8932E', desc: '~10:30 AM · 5,430 ft pass + first Rainier view' },
+      { name: 'Sunrise',        lat: 46.9145, lng: -121.6428, label: '2', color: '#3F6B8C', desc: '~11:30 AM · Mount Fremont Lookout' },
+      { name: 'Tacoma (base)',  lat: 47.2680, lng: -122.4890, label: 'H', color: '#7A5CA8', desc: '~6 PM · 3918 N Mullen St · 2 nights' }
     ],
     [
-      { color: '#B8336A', points: [[47.5181,-122.2580], [46.7866,-121.7359]] },
-      { color: '#9A6E80', points: [[46.7866,-121.7359], [46.9145,-121.6428]] },
-      { color: '#5A5855', dash: '5,5', points: [[46.9145,-121.6428], [47.5181,-122.2580]] }
+      { color: '#9A9693', points: [[47.7560,-117.4050], [46.9760,-120.5410], [46.8697,-121.5183]] },
+      { color: '#3F6B8C', points: [[46.8697,-121.5183], [46.9145,-121.6428]] },
+      { color: '#7A5CA8', dash: '5,5', points: [[46.9145,-121.6428], [47.2680,-122.4890]] }
+    ]
+  );
+
+  // ── AUG 2 · Tacoma → Paradise → Seattle → Tacoma ──
+  buildMap('day2-map',
+    [
+      { name: 'Tacoma (base)',  lat: 47.2680, lng: -122.4890, label: 'H', color: '#7A5CA8', desc: 'Depart 6:30 AM' },
+      { name: 'Paradise',       lat: 46.7866, lng: -121.7359, label: '1', color: '#B8336A', desc: '~8 AM · Skyline Trail loop' },
+      { name: 'Seattle',        lat: 47.6097, lng: -122.3422, label: '2', color: '#C8932E', desc: '~5 PM · Pike Place + dinner' },
+      { name: 'Tacoma (base)',  lat: 47.2680, lng: -122.4890, label: 'H', color: '#7A5CA8', desc: '~9 PM · Back for the night' }
+    ],
+    [
+      { color: '#B8336A', points: [[47.2680,-122.4890], [46.7866,-121.7359]] },
+      { color: '#C8932E', points: [[46.7866,-121.7359], [47.2529,-122.4443], [47.6097,-122.3422]] },
+      { color: '#7A5CA8', dash: '5,5', points: [[47.6097,-122.3422], [47.2680,-122.4890]] }
+    ]
+  );
+
+  // ── AUG 3 · Tacoma → Seattle → Bainbridge ferry → Port Angeles ──
+  buildMap('day3-map',
+    [
+      { name: 'Tacoma (base)',   lat: 47.2680, lng: -122.4890, label: 'H', color: '#7A5CA8', desc: 'Check out 8:30 AM' },
+      { name: 'Seattle',         lat: 47.6097, lng: -122.3422, label: '1', color: '#7A5CA8', desc: '~9:30 AM · Morning in the city' },
+      { name: 'Colman Dock ferry', lat: 47.6027, lng: -122.3384, label: '2', color: '#C8932E', desc: '~1:30 PM · 35-min sailing' },
+      { name: 'Bainbridge Island', lat: 47.6229, lng: -122.5108, label: '3', color: '#C8932E', desc: 'Drive off, head west on SR-305' },
+      { name: 'Port Angeles',    lat: 48.1183, lng: -123.4335, label: 'E', color: '#1A507A', desc: '~4:30 PM · Olympic leg base' }
+    ],
+    [
+      { color: '#7A5CA8', points: [[47.2680,-122.4890], [47.6097,-122.3422]] },
+      { color: '#C8932E', points: [[47.6097,-122.3422], [47.6027,-122.3384]] },
+      { color: '#C8932E', dash: '3,6', points: [[47.6027,-122.3384], [47.6229,-122.5108]] },
+      { color: '#1A507A', points: [[47.6229,-122.5108], [47.7550,-122.6280], [48.0400,-123.1180], [48.1183,-123.4335]] }
     ]
   );
 });
