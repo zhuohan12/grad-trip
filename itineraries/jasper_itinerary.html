@@ -125,6 +125,8 @@ body {
 .dot-golden  { background: var(--golden); }
 .stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
 .stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-name a { color: inherit; text-decoration: underline; text-decoration-color: rgba(26,26,26,0.28); text-underline-offset: 3px; }
+.stop-name a:hover, .stop-name a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
 .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
 .tag-hike-l  { background: #D8EEEE; color: #0C4F52; }
@@ -394,6 +396,35 @@ body {
 
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Depart DoubleTree by Hilton Kamloops': 'DoubleTree by Hilton Hotel Kamloops',
+    'Mount Robson Welcome Centre': 'Mount Robson Visitor Centre British Columbia',
+    'Medicine Lake': 'Medicine Lake Jasper National Park',
+    'Maligne Lake': 'Maligne Lake Jasper National Park',
+    'Downtown Jasper — Connaught Drive': 'Connaught Drive Jasper AB',
+    'Drive to Hinton': '130 Nickerson Ave Hinton AB',
+    'Depart Hinton': '130 Nickerson Ave Hinton AB',
+    'Sulphur Skyline Trail': 'Sulphur Skyline Trail Jasper National Park',
+    'Miette Hot Springs': 'Miette Hot Springs Jasper National Park',
+    'Pyramid Lake + Pyramid Island': 'Pyramid Island Jasper National Park',
+    'Back to Hinton': '130 Nickerson Ave Hinton AB'
+  });
+
   if (typeof L === 'undefined') {
     ['day1-map','day2-map'].forEach(function(id){
       var el = document.getElementById(id);

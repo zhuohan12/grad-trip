@@ -129,6 +129,8 @@ body {
 .dot-pacific { background: #1A507A; }
 .stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
 .stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-name a { color: inherit; text-decoration: underline; text-decoration-color: rgba(26,26,26,0.28); text-underline-offset: 3px; }
+.stop-name a:hover, .stop-name a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
 .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
 .tag-hike-a  { background: #DCE8F0; color: #1E4A63; }
@@ -569,6 +571,46 @@ body {
 
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Depart Calgary — head for the east side': '105B Magnolia Grove SE Calgary AB',
+    'Chief Mountain border crossing': 'Chief Mountain Border Crossing Montana',
+    'St Mary · east entrance + lunch': 'St Mary Visitor Center Glacier National Park',
+    'Drive the Going-to-the-Sun Road': 'Going-to-the-Sun Road Glacier National Park',
+    'West Glacier · supply stop': 'West Glacier Montana',
+    'Check in · Whitefish': '902 Karrow Ave Whitefish MT',
+    'Slow start, depart Whitefish': '902 Karrow Ave Whitefish MT',
+    'Lake McDonald · short leg-loosener': 'Lake McDonald Glacier National Park',
+    'Shuttle up the Going-to-the-Sun Road': 'Apgar Visitor Center Glacier National Park',
+    'Logan Pass → Highline Trail': 'Logan Pass Visitor Center Glacier National Park',
+    'The Loop → shuttle back': 'The Loop Going-to-the-Sun Road Glacier National Park',
+    'Drive back to Whitefish': '902 Karrow Ave Whitefish MT',
+    'Depart Whitefish — early': '902 Karrow Ave Whitefish MT',
+    'Grinnell Glacier Trailhead': 'Grinnell Glacier Trailhead Glacier National Park',
+    'Grinnell Glacier Trail': 'Grinnell Glacier Trail Glacier National Park',
+    'Lunch at the glacier basin': 'Grinnell Glacier Glacier National Park',
+    'Early breakfast, load the car': '902 Karrow Ave Whitefish MT',
+    'Apgar & Lake McDonald': 'Apgar Village Glacier National Park',
+    'Trail of the Cedars + Avalanche (optional)': 'Trail of the Cedars Glacier National Park',
+    'Back through Whitefish, pick up US-2 west': 'Whitefish MT',
+    'Sandpoint, ID · lakeside lunch': 'Sandpoint City Beach Sandpoint ID',
+    'Arrive Spokane': '417 West Barnes Road Spokane WA'
+  });
+
   if (typeof L === 'undefined') {
     ['day1-map','day2-map','day3-map','day4-map'].forEach(function(id){
       var el = document.getElementById(id);

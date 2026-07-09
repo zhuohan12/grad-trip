@@ -308,6 +308,17 @@ body {
   margin-bottom: 5px;
   line-height: 1.2;
 }
+.stop-name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(26,26,26,0.28);
+  text-underline-offset: 3px;
+}
+.stop-name a:hover,
+.stop-name a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
 
 .stop-tags {
   display: flex;
@@ -711,6 +722,37 @@ body {
 
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Depart Spokane': '417 West Barnes Road Spokane WA',
+    'Chinook Pass & Tipsoo Lake': 'Tipsoo Lake Mount Rainier National Park',
+    'Sunrise · Mount Fremont Fire Lookout': 'Mount Fremont Lookout Trail Mount Rainier National Park',
+    'Drive down to Tacoma': '3918 North Mullen Street Tacoma WA',
+    'Depart Tacoma for the Nisqually entrance': '3918 North Mullen Street Tacoma WA',
+    'Paradise · Skyline Trail loop': 'Paradise Mount Rainier National Park',
+    'Lunch + optional Paradise wander': 'Paradise Inn Mount Rainier National Park',
+    'Seattle · dinner in the city': 'Pike Place Market Seattle WA',
+    'Back to Tacoma': '3918 North Mullen Street Tacoma WA',
+    'Check out, drive up to Seattle': '3918 North Mullen Street Tacoma WA',
+    'Morning in Seattle': 'Pike Place Market Seattle WA',
+    'Seattle → Bainbridge Island ferry': 'Seattle Ferry Terminal Colman Dock',
+    'Bainbridge → Port Angeles': 'Bainbridge Island Ferry Terminal'
+  });
+
   if (typeof L === 'undefined') {
     ['day1-map','day2-map','day3-map'].forEach(function(id){
       var el = document.getElementById(id);

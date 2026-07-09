@@ -241,6 +241,17 @@ body {
   margin-bottom: 5px;
   line-height: 1.2;
 }
+.stop-name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(26,26,26,0.28);
+  text-underline-offset: 3px;
+}
+.stop-name a:hover,
+.stop-name a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+}
 
 .stop-tags {
   display: flex;
@@ -668,6 +679,34 @@ body {
 </div>
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Port Angeles · check in': '2010 South Oak Street Port Angeles WA',
+    'Hurricane Ridge — stargazing ⭐': 'Hurricane Ridge Olympic National Park',
+    'Hurricane Ridge': 'Hurricane Ridge Olympic National Park',
+    'Sol Duc Falls': 'Sol Duc Falls Olympic National Park',
+    'Sol Duc Hot Springs': 'Sol Duc Hot Springs Resort Olympic National Park',
+    'Lake Crescent + Marymere Falls': 'Marymere Falls Trail Lake Crescent Olympic National Park',
+    'Depart Port Angeles': '2010 South Oak Street Port Angeles WA',
+    'Hoh Rainforest': 'Hoh Rain Forest Visitor Center Olympic National Park',
+    'Ruby Beach': 'Ruby Beach Olympic National Park',
+    'Rialto Beach': 'Rialto Beach Olympic National Park'
+  });
+
   if (typeof L === 'undefined') {
     ['day1-map','day2-map'].forEach(function(id){
       var el = document.getElementById(id);

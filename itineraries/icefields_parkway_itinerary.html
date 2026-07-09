@@ -126,6 +126,8 @@ body {
 .dot-meadow  { background: var(--meadow); }
 .stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
 .stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-name a { color: inherit; text-decoration: underline; text-decoration-color: rgba(26,26,26,0.28); text-underline-offset: 3px; }
+.stop-name a:hover, .stop-name a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
 .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
 .tag-easy    { background: #DCEEF2; color: #134E5C; }
@@ -351,6 +353,34 @@ body {
 
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Set off early': 'Hinton AB',
+    'Athabasca Falls': 'Athabasca Falls Jasper National Park',
+    'Sunwapta Falls': 'Sunwapta Falls Jasper National Park',
+    'Tangle Creek Falls': 'Tangle Creek Falls Icefields Parkway',
+    'Toe of the Athabasca Glacier Trailhead': 'Toe of the Athabasca Glacier Trailhead Jasper National Park',
+    'Wilcox Pass (optional)': 'Wilcox Pass Trailhead Jasper National Park',
+    'Mistaya Canyon': 'Mistaya Canyon Banff National Park',
+    'Peyto Lake': 'Peyto Lake Viewpoint Banff National Park',
+    'Bow Lake': 'Bow Lake Banff National Park',
+    'Continue to Canmore': '160 Kananaskis Way Canmore AB'
+  });
+
   if (typeof L === 'undefined') {
     var el = document.getElementById('day1-map');
     if (el) el.innerHTML = '<div style="padding:1rem;font-family:Inter,sans-serif;font-size:13px;color:#51585A">Map library failed to load. Check your internet connection and refresh.</div>';

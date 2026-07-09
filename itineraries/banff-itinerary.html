@@ -126,6 +126,8 @@ body {
 .dot-gold    { background: var(--gold); }
 .stop-time { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 3px; }
 .stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-name a { color: inherit; text-decoration: underline; text-decoration-color: rgba(26,26,26,0.28); text-underline-offset: 3px; }
+.stop-name a:hover, .stop-name a:focus-visible { color: var(--ink); text-decoration-color: currentColor; }
 .stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
 .tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
 .tag-hike-l  { background: #D7EEF3; color: #0D4E5C; }
@@ -490,6 +492,39 @@ body {
 
 <script>
 window.addEventListener('DOMContentLoaded', function(){
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el){
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Morning in downtown Banff': 'Banff Avenue Banff AB',
+    'Moraine Lake': 'Moraine Lake Banff National Park',
+    'Lake Connector to Lake Louise': 'Lake Louise Lakeshore Banff National Park',
+    'Little Beehive': 'Little Beehive Trail Lake Louise',
+    'Dinner in downtown Banff': 'Banff Avenue Banff AB restaurants',
+    'Return to Canmore': '160 Kananaskis Way Canmore AB',
+    'Depart Canmore': '160 Kananaskis Way Canmore AB',
+    'Emerald Lake — canoe': 'Emerald Lake Yoho National Park',
+    'Natural Bridge': 'Natural Bridge Yoho National Park',
+    'Wapta Falls': 'Wapta Falls Trailhead Yoho National Park',
+    'Takakkaw Falls': 'Takakkaw Falls Yoho National Park',
+    'Johnston Canyon': 'Johnston Canyon Banff National Park',
+    'Lake Minnewanka loop': 'Lake Minnewanka Banff National Park',
+    'Lunch in Banff townsite': 'Banff Avenue Banff AB restaurants',
+    'Drive to Calgary': '105B Magnolia Grove SE Calgary AB'
+  });
+
   if (typeof L === 'undefined') {
     ['day1-map','day2-map','day3-map'].forEach(function(id){
       var el = document.getElementById(id);
