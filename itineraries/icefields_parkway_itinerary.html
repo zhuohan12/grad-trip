@@ -495,8 +495,11 @@ window.addEventListener('DOMContentLoaded', function(){
 
 <script>
 /* Live hike-day forecast via Open-Meteo (free, no API key, CORS-enabled).
-   Populates each .trail-info card with the forecast for its data-date.
-   Beyond the ~16-day forecast window it shows a graceful fallback + detailed link. */
+   Uses forecast_days=16 and matches the hike date client-side, so we can tell
+   "date still beyond the 16-day window" apart from "the request failed".
+   NOTE: fetch() to a remote API is blocked by browsers when the page is opened
+   as a file:// document. Serve the folder over http (e.g. `python3 -m http.server`)
+   or via GitHub Pages for the live forecast to load. */
 (function(){
   var WMO={0:['\u2600\uFE0F','Clear'],1:['\uD83C\uDF24\uFE0F','Mainly clear'],2:['\u26C5','Partly cloudy'],
     3:['\u2601\uFE0F','Overcast'],45:['\uD83C\uDF2B\uFE0F','Fog'],48:['\uD83C\uDF2B\uFE0F','Rime fog'],
@@ -509,26 +512,32 @@ window.addEventListener('DOMContentLoaded', function(){
     95:['\u26C8\uFE0F','Thunderstorm'],96:['\u26C8\uFE0F','Thunderstorm'],99:['\u26C8\uFE0F','Thunderstorm']};
   var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   function pretty(iso){var p=iso.split('-');return MON[(+p[1])-1]+' '+(+p[2]);}
+  function link(windy){return '<a href="'+windy+'" target="_blank" rel="noopener">point forecast</a>';}
   function load(el){
     var lat=el.getAttribute('data-lat'),lon=el.getAttribute('data-lon'),date=el.getAttribute('data-date');
     var out=el.querySelector('[data-wx]');if(!out)return;
     var windy='https://www.windy.com/?'+lat+','+lon+',9';
     var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
       '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max'+
-      '&wind_speed_unit=kmh&timezone=auto&start_date='+date+'&end_date='+date;
-    fetch(url).then(function(r){return r.json();}).then(function(d){
-      if(!d||!d.daily||!d.daily.time||!d.daily.time.length||d.daily.temperature_2m_max[0]==null)throw 0;
-      var i=0,dd=d.daily,c=dd.weather_code[i],w=WMO[c]||['\uD83C\uDF21\uFE0F',''];
+      '&wind_speed_unit=kmh&timezone=auto&forecast_days=16';
+    fetch(url).then(function(r){if(!r.ok)throw new Error('http '+r.status);return r.json();}).then(function(d){
+      if(!d||!d.daily||!d.daily.time)throw new Error('bad shape');
+      var i=d.daily.time.indexOf(date);
+      if(i<0){ // date is genuinely outside the 16-day forecast window
+        out.innerHTML='<span class="wx-badge wx-muted">Forecast</span>'+
+          'Live forecast unlocks ~16 days before the date \u2014 '+link(windy)+'.';
+        return;
+      }
+      var dd=d.daily,c=dd.weather_code[i],w=WMO[c]||['\uD83C\uDF21\uFE0F',''];
       var hi=Math.round(dd.temperature_2m_max[i]),lo=Math.round(dd.temperature_2m_min[i]);
       var pop=dd.precipitation_probability_max[i],wind=Math.round(dd.wind_speed_10m_max[i]);
       out.innerHTML='<span class="wx-badge">'+w[0]+' Forecast '+pretty(date)+'</span>'+
         (w[1]?w[1]+' \u00B7 ':'')+'<span class="wx-temp">'+hi+'\u00B0 / '+lo+'\u00B0C</span> \u00B7 '+
-        (pop!=null?pop+'% precip \u00B7 ':'')+'wind '+wind+' km/h \u00B7 '+
-        '<a href="'+windy+'" target="_blank" rel="noopener">details</a>';
-    }).catch(function(){
+        (pop!=null?pop+'% precip \u00B7 ':'')+'wind '+wind+' km/h \u00B7 '+link(windy);
+    }).catch(function(err){ // network / CORS / file:// / API error — NOT a date-window issue
       out.innerHTML='<span class="wx-badge wx-muted">Forecast</span>'+
-        'Live forecast unlocks within ~16 days of the date \u2014 '+
-        '<a href="'+windy+'" target="_blank" rel="noopener">open the point forecast</a>.';
+        'Couldn\u2019t load the live forecast \u2014 this needs the page served over http (not opened as a file). '+
+        'Meanwhile, see the '+link(windy)+'.';
     });
   }
   var cards=document.querySelectorAll('.trail-info[data-lat]');
