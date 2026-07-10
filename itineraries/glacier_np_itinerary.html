@@ -177,6 +177,19 @@ body {
   .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .stop, .day-section, .tips { page-break-inside: avoid; }
 }
+
+/* --- trail-info enrichment (AllTrails link + metric stats + live forecast) --- */
+.trail-info{margin-top:10px;padding:10px 12px;border:1px solid rgba(0,0,0,0.10);border-radius:8px;background:rgba(0,0,0,0.025);}
+.trail-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'Inter',system-ui,sans-serif;}
+.ti-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.02em;text-decoration:none;padding:3px 9px;border-radius:999px;border:1px solid rgba(0,0,0,0.18);color:#1a1a1a;background:#fff;white-space:nowrap;transition:background .15s,color .15s;}
+.ti-btn:hover,.ti-btn:focus-visible{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.ti-stats{font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#5a5a5a;}
+.ti-wx{margin-top:7px;font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#3f3f3f;line-height:1.45;}
+.ti-wx a{color:#25506b;}
+.wx-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:#e6eef3;color:#25506b;margin-right:6px;vertical-align:1px;}
+.wx-badge.wx-muted{background:#ececec;color:#777;}
+.wx-temp{font-weight:600;color:#1a1a1a;}
+
 </style>
 </head>
 <body>
@@ -385,6 +398,14 @@ body {
           <div class="stop-desc">From Logan Pass (6,646 ft) the trail begins with the famous narrow ledge below the Garden Wall — a hand cable bolted to the rock, a big drop to the road below, but wide enough and safe at a steady pace. It then undulates through alpine meadow to Haystack Pass (the main climb, ~3.5 mi), continues to Granite Park Chalet at 7.6 mi, then drops ~4 mi of switchbacks to The Loop. Mountain goats and bighorn sheep are common along the wall. An ~11:30 start has you finishing around 5:30 — well ahead of the 7:30 PM last shuttle — so the pace is relaxed, not rushed.</div>
           <div class="stop-specs">
             <div class="spec"><b>Highline · Logan Pass to The Loop</b> &nbsp;11.6 mi / 18 km point-to-point &nbsp;·&nbsp; ~1,450 ft / 440 m gain (net descent) &nbsp;·&nbsp; ~6 hrs &nbsp;·&nbsp; Moderate–strenuous</div>
+            <div class="trail-info" data-lat="48.6969" data-lon="-113.7180" data-date="2026-07-29">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/trail/us/montana/highline-trail-logan-pass-to-the-loop-trailhead" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?48.6969,-113.7180,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~19 km point-to-point · ~460 m gain · ~6.5–7 h · Hard</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
           <div class="stop-specs">
             <div class="spec"><b>Grinnell Glacier Overlook spur</b> &nbsp;optional, steep &nbsp;·&nbsp; +1.2 mi / +1,000 ft RT &nbsp;·&nbsp; skip it — you're seeing the glacier up close tomorrow</div>
@@ -453,6 +474,14 @@ body {
           <div class="stop-desc">A flat 2 mi warm-up along Swiftcurrent Lake and Lake Josephine, then 2.5 mi of real climbing past a trailside waterfall (you walk under it — stash electronics), then a steep final mile of rocky steps to the glacier basin: a blue-green meltwater pool beneath the Garden Wall and the Continental Divide. Prime bear country, so make noise and keep the spray accessible. A $35 boat shuttle across the two lakes can trim ~3.5 mi off the round trip if anyone's legs are spent from Highline.</div>
           <div class="stop-specs">
             <div class="spec"><b>Grinnell Glacier · out-and-back</b> &nbsp;11 mi / 18 km RT &nbsp;·&nbsp; 2,600 ft / 790 m gain &nbsp;·&nbsp; ~6–7 hrs &nbsp;·&nbsp; Strenuous</div>
+            <div class="trail-info" data-lat="48.7971" data-lon="-113.6684" data-date="2026-07-30">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/trail/us/montana/grinnell-glacier-trail" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?48.7971,-113.6684,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~18 km RT · ~625 m gain · ~6 h · Hard</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
           <div class="ww-note"><b>Wheatless Wanderlust note:</b> Their Grinnell guide uses the full trailhead-to-glacier route and calls out the Many Glacier Hotel start as a similar option with a larger lot. If legs are tired after Highline, the lake boat shuttle can shorten the day, but you lose some easy lakeshore walking. <a href="https://wheatlesswanderlust.com/grinnell-glacier-trail-guide/" target="_blank" rel="noopener">Photos + trail guide</a></div>
         </div>
@@ -517,7 +546,23 @@ body {
           <div class="stop-desc">If legs are willing, drive ~25 min up the Going-to-the-Sun Road to the Trail of the Cedars, an easy 1 mi boardwalk loop through old-growth red cedar and hemlock — flat, shaded, and a completely different Glacier from the alpine you've had. Those wanting one more real hike can continue from the same trailhead to Avalanche Lake (4.5 mi RT, ~600 ft, ~2.5 hrs) beneath a wall of waterfalls. Skip either without guilt to keep the drive easy.</div>
           <div class="stop-specs">
             <div class="spec"><b>Trail of the Cedars</b> &nbsp;1 mi loop &nbsp;·&nbsp; Easy</div>
+            <div class="trail-info" data-lat="48.6799" data-lon="-113.8188" data-date="2026-07-31">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Trail%20of%20the%20Cedars%20Glacier%20National%20Park" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?48.6799,-113.8188,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~1.6 km loop · flat · Easy</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
             <div class="spec"><b>Avalanche Lake</b> &nbsp;4.5 mi RT &nbsp;·&nbsp; ~600 ft &nbsp;·&nbsp; Moderate</div>
+            <div class="trail-info" data-lat="48.6799" data-lon="-113.8188" data-date="2026-07-31">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Avalanche%20Lake%20Glacier%20National%20Park" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?48.6799,-113.8188,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~7.2 km RT · ~185 m gain · ~2.5 h · Moderate</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
         </div>
 
@@ -750,5 +795,49 @@ window.addEventListener('DOMContentLoaded', function(){
   );
 });
 </script>
+
+<script>
+/* Live hike-day forecast via Open-Meteo (free, no API key, CORS-enabled).
+   Populates each .trail-info card with the forecast for its data-date.
+   Beyond the ~16-day forecast window it shows a graceful fallback + detailed link. */
+(function(){
+  var WMO={0:['\u2600\uFE0F','Clear'],1:['\uD83C\uDF24\uFE0F','Mainly clear'],2:['\u26C5','Partly cloudy'],
+    3:['\u2601\uFE0F','Overcast'],45:['\uD83C\uDF2B\uFE0F','Fog'],48:['\uD83C\uDF2B\uFE0F','Rime fog'],
+    51:['\uD83C\uDF26\uFE0F','Light drizzle'],53:['\uD83C\uDF26\uFE0F','Drizzle'],55:['\uD83C\uDF26\uFE0F','Heavy drizzle'],
+    61:['\uD83C\uDF27\uFE0F','Light rain'],63:['\uD83C\uDF27\uFE0F','Rain'],65:['\uD83C\uDF27\uFE0F','Heavy rain'],
+    66:['\uD83C\uDF27\uFE0F','Freezing rain'],67:['\uD83C\uDF27\uFE0F','Freezing rain'],
+    71:['\uD83C\uDF28\uFE0F','Light snow'],73:['\uD83C\uDF28\uFE0F','Snow'],75:['\uD83C\uDF28\uFE0F','Heavy snow'],
+    77:['\uD83C\uDF28\uFE0F','Snow grains'],80:['\uD83C\uDF26\uFE0F','Rain showers'],81:['\uD83C\uDF26\uFE0F','Rain showers'],
+    82:['\u26C8\uFE0F','Violent showers'],85:['\uD83C\uDF28\uFE0F','Snow showers'],86:['\uD83C\uDF28\uFE0F','Snow showers'],
+    95:['\u26C8\uFE0F','Thunderstorm'],96:['\u26C8\uFE0F','Thunderstorm'],99:['\u26C8\uFE0F','Thunderstorm']};
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function pretty(iso){var p=iso.split('-');return MON[(+p[1])-1]+' '+(+p[2]);}
+  function load(el){
+    var lat=el.getAttribute('data-lat'),lon=el.getAttribute('data-lon'),date=el.getAttribute('data-date');
+    var out=el.querySelector('[data-wx]');if(!out)return;
+    var windy='https://www.windy.com/?'+lat+','+lon+',9';
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max'+
+      '&wind_speed_unit=kmh&timezone=auto&start_date='+date+'&end_date='+date;
+    fetch(url).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.daily||!d.daily.time||!d.daily.time.length||d.daily.temperature_2m_max[0]==null)throw 0;
+      var i=0,dd=d.daily,c=dd.weather_code[i],w=WMO[c]||['\uD83C\uDF21\uFE0F',''];
+      var hi=Math.round(dd.temperature_2m_max[i]),lo=Math.round(dd.temperature_2m_min[i]);
+      var pop=dd.precipitation_probability_max[i],wind=Math.round(dd.wind_speed_10m_max[i]);
+      out.innerHTML='<span class="wx-badge">'+w[0]+' Forecast '+pretty(date)+'</span>'+
+        (w[1]?w[1]+' \u00B7 ':'')+'<span class="wx-temp">'+hi+'\u00B0 / '+lo+'\u00B0C</span> \u00B7 '+
+        (pop!=null?pop+'% precip \u00B7 ':'')+'wind '+wind+' km/h \u00B7 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">details</a>';
+    }).catch(function(){
+      out.innerHTML='<span class="wx-badge wx-muted">Forecast</span>'+
+        'Live forecast unlocks within ~16 days of the date \u2014 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">open the point forecast</a>.';
+    });
+  }
+  var cards=document.querySelectorAll('.trail-info[data-lat]');
+  for(var i=0;i<cards.length;i++)load(cards[i]);
+})();
+</script>
+
 </body>
 </html>

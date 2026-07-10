@@ -174,6 +174,19 @@ body {
   .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .stop, .day-section, .tips { page-break-inside: avoid; }
 }
+
+/* --- trail-info enrichment (AllTrails link + metric stats + live forecast) --- */
+.trail-info{margin-top:10px;padding:10px 12px;border:1px solid rgba(0,0,0,0.10);border-radius:8px;background:rgba(0,0,0,0.025);}
+.trail-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'Inter',system-ui,sans-serif;}
+.ti-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.02em;text-decoration:none;padding:3px 9px;border-radius:999px;border:1px solid rgba(0,0,0,0.18);color:#1a1a1a;background:#fff;white-space:nowrap;transition:background .15s,color .15s;}
+.ti-btn:hover,.ti-btn:focus-visible{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.ti-stats{font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#5a5a5a;}
+.ti-wx{margin-top:7px;font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#3f3f3f;line-height:1.45;}
+.ti-wx a{color:#25506b;}
+.wx-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:#e6eef3;color:#25506b;margin-right:6px;vertical-align:1px;}
+.wx-badge.wx-muted{background:#ececec;color:#777;}
+.wx-temp{font-weight:600;color:#1a1a1a;}
+
 </style>
 </head>
 <body>
@@ -276,6 +289,14 @@ body {
           <div class="stop-desc">Board the 1 PM Parks Canada shuttle at the Lake Louise Park &amp; Ride (private vehicles can't drive Moraine Lake Road). Climb the Rockpile for the classic Ten Peaks view, then walk the flat Lakeshore Trail along the water. Aim to keep it to about an hour so you can catch the connector with time to spare.</div>
           <div class="stop-specs">
             <div class="spec"><b>Rockpile + Lakeshore Trail</b> &nbsp;~3 km total &nbsp;·&nbsp; flat &nbsp;·&nbsp; ~1 hr &nbsp;·&nbsp; Easy</div>
+            <div class="trail-info" data-lat="51.3282" data-lon="-116.1770" data-date="2026-07-25">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Moraine%20Lake%20Rockpile%20Trail" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?51.3282,-116.1770,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~3 km · flat · ~1 h · Easy</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
         </div>
 
@@ -297,6 +318,14 @@ body {
           <div class="stop-desc">Climb from the Lake Louise lakeshore past Mirror Lake to the Lake Agnes Tea House, then up the short spur to the Little Beehive lookout over the Bow Valley. This is the version of the climb that fits before the last shuttle — Big Beehive adds ~1.5 hrs and would push you past it. If the connector ran late, turn around at the tea house and you'll still have done most of the climb. Back at the lakeshore by ~6:45.</div>
           <div class="stop-specs">
             <div class="spec"><b>Little Beehive via Lake Agnes</b> &nbsp;~8.5 km RT &nbsp;·&nbsp; ~500 m gain &nbsp;·&nbsp; ~3–3.5 hrs &nbsp;·&nbsp; Moderate</div>
+            <div class="trail-info" data-lat="51.4171" data-lon="-116.2172" data-date="2026-07-25">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Lake%20Agnes%20Little%20Beehive" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?51.4171,-116.2172,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~8.5 km RT · ~500 m gain · ~3–3.5 h · Moderate</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
           <div class="ww-note"><b>Wheatless Wanderlust note:</b> Their Lake Louise hiking guide favors the bigger Big Beehive / Plain of Six Glaciers options, but also calls Little Beehive the lighter Lake Agnes version. On a 1 PM Moraine shuttle day, Little Beehive is the practical ceiling; if the connector runs late, stop at Lake Agnes. <a href="https://wheatlesswanderlust.com/canadian-rockies-road-trip-itinerary/" target="_blank" rel="noopener">Photos + guide</a></div>
         </div>
@@ -376,6 +405,14 @@ body {
           <div class="stop-desc">Drive ~30 min west to the widest waterfall on the Kicking Horse River. The hike in keeps crowds thinner than the roadside stops, so midday timing is fine here. Doing Wapta now — before doubling back east — is what keeps the day from backtracking.</div>
           <div class="stop-specs">
             <div class="spec"><b>Wapta Falls Trail</b> &nbsp;4.6 km RT &nbsp;·&nbsp; ~150 m gain &nbsp;·&nbsp; ~1.5–2 hrs &nbsp;·&nbsp; Easy–moderate</div>
+            <div class="trail-info" data-lat="51.1668" data-lon="-116.5710" data-date="2026-07-26">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Wapta%20Falls%20Yoho" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?51.1668,-116.5710,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">4.6 km RT · ~150 m gain · ~1.5–2 h · Easy–moderate</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
         </div>
 
@@ -435,6 +472,14 @@ body {
           <div class="stop-desc">Walk the catwalks bolted into the limestone canyon to the Lower then Upper Falls. Going at opening keeps the narrow walkways from bottlenecking. Monday helps too, but the lot still fills — early is the move. Turn around at the Lower Falls if you're short on time; the first section is the most dramatic.</div>
           <div class="stop-specs">
             <div class="spec"><b>Lower + Upper Falls</b> &nbsp;~5.4 km RT &nbsp;·&nbsp; ~120 m gain &nbsp;·&nbsp; ~2.5 hrs &nbsp;·&nbsp; Easy–moderate</div>
+            <div class="trail-info" data-lat="51.2452" data-lon="-115.8392" data-date="2026-07-27">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Johnston%20Canyon%20Upper%20Falls" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?51.2452,-115.8392,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~5.4 km RT · ~120 m gain · ~2.5 h · Easy–moderate</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
           <div class="ww-note"><b>Wheatless Wanderlust note:</b> Their Canadian Rockies itinerary is aggressive about avoiding peak crowds at classic Banff stops. Keep this early start; do not add the Ink Pots unless everyone wants a longer hiking morning and is willing to compress Minnewanka. <a href="https://wheatlesswanderlust.com/canadian-rockies-road-trip-itinerary/" target="_blank" rel="noopener">Photos + guide</a></div>
         </div>
@@ -639,5 +684,49 @@ window.addEventListener('DOMContentLoaded', function(){
   );
 });
 </script>
+
+<script>
+/* Live hike-day forecast via Open-Meteo (free, no API key, CORS-enabled).
+   Populates each .trail-info card with the forecast for its data-date.
+   Beyond the ~16-day forecast window it shows a graceful fallback + detailed link. */
+(function(){
+  var WMO={0:['\u2600\uFE0F','Clear'],1:['\uD83C\uDF24\uFE0F','Mainly clear'],2:['\u26C5','Partly cloudy'],
+    3:['\u2601\uFE0F','Overcast'],45:['\uD83C\uDF2B\uFE0F','Fog'],48:['\uD83C\uDF2B\uFE0F','Rime fog'],
+    51:['\uD83C\uDF26\uFE0F','Light drizzle'],53:['\uD83C\uDF26\uFE0F','Drizzle'],55:['\uD83C\uDF26\uFE0F','Heavy drizzle'],
+    61:['\uD83C\uDF27\uFE0F','Light rain'],63:['\uD83C\uDF27\uFE0F','Rain'],65:['\uD83C\uDF27\uFE0F','Heavy rain'],
+    66:['\uD83C\uDF27\uFE0F','Freezing rain'],67:['\uD83C\uDF27\uFE0F','Freezing rain'],
+    71:['\uD83C\uDF28\uFE0F','Light snow'],73:['\uD83C\uDF28\uFE0F','Snow'],75:['\uD83C\uDF28\uFE0F','Heavy snow'],
+    77:['\uD83C\uDF28\uFE0F','Snow grains'],80:['\uD83C\uDF26\uFE0F','Rain showers'],81:['\uD83C\uDF26\uFE0F','Rain showers'],
+    82:['\u26C8\uFE0F','Violent showers'],85:['\uD83C\uDF28\uFE0F','Snow showers'],86:['\uD83C\uDF28\uFE0F','Snow showers'],
+    95:['\u26C8\uFE0F','Thunderstorm'],96:['\u26C8\uFE0F','Thunderstorm'],99:['\u26C8\uFE0F','Thunderstorm']};
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function pretty(iso){var p=iso.split('-');return MON[(+p[1])-1]+' '+(+p[2]);}
+  function load(el){
+    var lat=el.getAttribute('data-lat'),lon=el.getAttribute('data-lon'),date=el.getAttribute('data-date');
+    var out=el.querySelector('[data-wx]');if(!out)return;
+    var windy='https://www.windy.com/?'+lat+','+lon+',9';
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max'+
+      '&wind_speed_unit=kmh&timezone=auto&start_date='+date+'&end_date='+date;
+    fetch(url).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.daily||!d.daily.time||!d.daily.time.length||d.daily.temperature_2m_max[0]==null)throw 0;
+      var i=0,dd=d.daily,c=dd.weather_code[i],w=WMO[c]||['\uD83C\uDF21\uFE0F',''];
+      var hi=Math.round(dd.temperature_2m_max[i]),lo=Math.round(dd.temperature_2m_min[i]);
+      var pop=dd.precipitation_probability_max[i],wind=Math.round(dd.wind_speed_10m_max[i]);
+      out.innerHTML='<span class="wx-badge">'+w[0]+' Forecast '+pretty(date)+'</span>'+
+        (w[1]?w[1]+' \u00B7 ':'')+'<span class="wx-temp">'+hi+'\u00B0 / '+lo+'\u00B0C</span> \u00B7 '+
+        (pop!=null?pop+'% precip \u00B7 ':'')+'wind '+wind+' km/h \u00B7 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">details</a>';
+    }).catch(function(){
+      out.innerHTML='<span class="wx-badge wx-muted">Forecast</span>'+
+        'Live forecast unlocks within ~16 days of the date \u2014 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">open the point forecast</a>.';
+    });
+  }
+  var cards=document.querySelectorAll('.trail-info[data-lat]');
+  for(var i=0;i<cards.length;i++)load(cards[i]);
+})();
+</script>
+
 </body>
 </html>

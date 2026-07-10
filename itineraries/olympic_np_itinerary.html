@@ -461,6 +461,19 @@ body {
   .day-section { page-break-inside: avoid; }
   .tips { page-break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* --- trail-info enrichment (AllTrails link + metric stats + live forecast) --- */
+.trail-info{margin-top:10px;padding:10px 12px;border:1px solid rgba(0,0,0,0.10);border-radius:8px;background:rgba(0,0,0,0.025);}
+.trail-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:'Inter',system-ui,sans-serif;}
+.ti-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;letter-spacing:.02em;text-decoration:none;padding:3px 9px;border-radius:999px;border:1px solid rgba(0,0,0,0.18);color:#1a1a1a;background:#fff;white-space:nowrap;transition:background .15s,color .15s;}
+.ti-btn:hover,.ti-btn:focus-visible{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
+.ti-stats{font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#5a5a5a;}
+.ti-wx{margin-top:7px;font-family:'Inter',system-ui,sans-serif;font-size:12px;color:#3f3f3f;line-height:1.45;}
+.ti-wx a{color:#25506b;}
+.wx-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:#e6eef3;color:#25506b;margin-right:6px;vertical-align:1px;}
+.wx-badge.wx-muted{background:#ececec;color:#777;}
+.wx-temp{font-weight:600;color:#1a1a1a;}
+
 </style>
 </head>
 <body>
@@ -568,6 +581,14 @@ body {
           <div class="stop-desc">Drive 17 miles south from Port Angeles (~45 min) to the most accessible subalpine zone in the park at 5,242 ft. Olympic marmots graze the meadows and the full Olympic Range fills the horizon. Hit the trailhead early — parking is completely full by 10 AM in August.</div>
           <div class="stop-specs">
             <div class="spec"><b>Hurricane Hill Trail</b> &nbsp;3.2 mi RT &nbsp;·&nbsp; 700 ft gain &nbsp;·&nbsp; ~2.5 hrs &nbsp;·&nbsp; Moderate</div>
+            <div class="trail-info" data-lat="47.9790" data-lon="-123.5150" data-date="2026-08-04">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Hurricane%20Hill%20Olympic" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?47.9790,-123.5150,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">~5.1 km RT · ~210 m gain · ~2.5 h · Moderate</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
           </div>
           <div class="stop-specs">
             <div class="spec"><b>Big Meadow loop</b> &nbsp;0.5 mi paved &nbsp;·&nbsp; Easy add-on near visitor centre</div>
@@ -639,6 +660,14 @@ body {
           <div class="stop-specs">
             <div class="spec"><b>Hall of Mosses</b> &nbsp;0.8 mi loop</div>
             <div class="spec"><b>Hoh River Trail</b> &nbsp;2–3 mi in and back</div>
+            <div class="trail-info" data-lat="47.8606" data-lon="-123.9347" data-date="2026-08-05">
+              <div class="trail-links">
+                <a class="ti-btn" href="https://www.alltrails.com/search?q=Hoh%20River%20Trail%20Hall%20of%20Mosses" target="_blank" rel="noopener">AllTrails ↗</a>
+                <a class="ti-btn" href="https://www.windy.com/?47.8606,-123.9347,9" target="_blank" rel="noopener">Forecast ↗</a>
+                <span class="ti-stats">Hall of Mosses 1.3 km loop + up to ~5 km RT · flat · ~2.5 h · Easy</span>
+              </div>
+              <div class="ti-wx" data-wx>Checking the forecast…</div>
+            </div>
             <div class="spec">~2.5 hrs total &nbsp;·&nbsp; Easy</div>
           </div>
           <div class="ww-note"><b>Wheatless Wanderlust note:</b> Their Olympic plan is blunt about Hoh crowds: arrive by 9 AM, ideally earlier, because peak summer can become one-car-in/one-car-out. Do Hall of Mosses first, then Spruce Nature Trail or a short Hoh River out-and-back depending on time. <a href="https://wheatlesswanderlust.com/olympic-national-park-itinerary/" target="_blank" rel="noopener">Photos + guide</a></div>
@@ -813,5 +842,49 @@ window.addEventListener('DOMContentLoaded', function(){
   );
 });
 </script>
+
+<script>
+/* Live hike-day forecast via Open-Meteo (free, no API key, CORS-enabled).
+   Populates each .trail-info card with the forecast for its data-date.
+   Beyond the ~16-day forecast window it shows a graceful fallback + detailed link. */
+(function(){
+  var WMO={0:['\u2600\uFE0F','Clear'],1:['\uD83C\uDF24\uFE0F','Mainly clear'],2:['\u26C5','Partly cloudy'],
+    3:['\u2601\uFE0F','Overcast'],45:['\uD83C\uDF2B\uFE0F','Fog'],48:['\uD83C\uDF2B\uFE0F','Rime fog'],
+    51:['\uD83C\uDF26\uFE0F','Light drizzle'],53:['\uD83C\uDF26\uFE0F','Drizzle'],55:['\uD83C\uDF26\uFE0F','Heavy drizzle'],
+    61:['\uD83C\uDF27\uFE0F','Light rain'],63:['\uD83C\uDF27\uFE0F','Rain'],65:['\uD83C\uDF27\uFE0F','Heavy rain'],
+    66:['\uD83C\uDF27\uFE0F','Freezing rain'],67:['\uD83C\uDF27\uFE0F','Freezing rain'],
+    71:['\uD83C\uDF28\uFE0F','Light snow'],73:['\uD83C\uDF28\uFE0F','Snow'],75:['\uD83C\uDF28\uFE0F','Heavy snow'],
+    77:['\uD83C\uDF28\uFE0F','Snow grains'],80:['\uD83C\uDF26\uFE0F','Rain showers'],81:['\uD83C\uDF26\uFE0F','Rain showers'],
+    82:['\u26C8\uFE0F','Violent showers'],85:['\uD83C\uDF28\uFE0F','Snow showers'],86:['\uD83C\uDF28\uFE0F','Snow showers'],
+    95:['\u26C8\uFE0F','Thunderstorm'],96:['\u26C8\uFE0F','Thunderstorm'],99:['\u26C8\uFE0F','Thunderstorm']};
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function pretty(iso){var p=iso.split('-');return MON[(+p[1])-1]+' '+(+p[2]);}
+  function load(el){
+    var lat=el.getAttribute('data-lat'),lon=el.getAttribute('data-lon'),date=el.getAttribute('data-date');
+    var out=el.querySelector('[data-wx]');if(!out)return;
+    var windy='https://www.windy.com/?'+lat+','+lon+',9';
+    var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max'+
+      '&wind_speed_unit=kmh&timezone=auto&start_date='+date+'&end_date='+date;
+    fetch(url).then(function(r){return r.json();}).then(function(d){
+      if(!d||!d.daily||!d.daily.time||!d.daily.time.length||d.daily.temperature_2m_max[0]==null)throw 0;
+      var i=0,dd=d.daily,c=dd.weather_code[i],w=WMO[c]||['\uD83C\uDF21\uFE0F',''];
+      var hi=Math.round(dd.temperature_2m_max[i]),lo=Math.round(dd.temperature_2m_min[i]);
+      var pop=dd.precipitation_probability_max[i],wind=Math.round(dd.wind_speed_10m_max[i]);
+      out.innerHTML='<span class="wx-badge">'+w[0]+' Forecast '+pretty(date)+'</span>'+
+        (w[1]?w[1]+' \u00B7 ':'')+'<span class="wx-temp">'+hi+'\u00B0 / '+lo+'\u00B0C</span> \u00B7 '+
+        (pop!=null?pop+'% precip \u00B7 ':'')+'wind '+wind+' km/h \u00B7 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">details</a>';
+    }).catch(function(){
+      out.innerHTML='<span class="wx-badge wx-muted">Forecast</span>'+
+        'Live forecast unlocks within ~16 days of the date \u2014 '+
+        '<a href="'+windy+'" target="_blank" rel="noopener">open the point forecast</a>.';
+    });
+  }
+  var cards=document.querySelectorAll('.trail-info[data-lat]');
+  for(var i=0;i<cards.length;i++)load(cards[i]);
+})();
+</script>
+
 </body>
 </html>
