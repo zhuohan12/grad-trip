@@ -103,11 +103,13 @@ body {
 }
 .nav-body { flex: 1; min-width: 0; }
 .nav-name {
+  display: block;
   font-size: 13.5px; font-weight: 500; color: #E7EDEF;
   line-height: 1.25; letter-spacing: 0.01em;
 }
 .nav-item.active .nav-name { color: #fff; }
 .nav-dates {
+  display: block;
   font-size: 11px; color: var(--side-dim); margin-top: 2px;
   font-variant-numeric: tabular-nums;
 }
@@ -196,7 +198,16 @@ body {
     box-shadow: 2px 0 24px rgba(0,0,0,0.3);
   }
   .sidebar.open { transform: translateX(0); }
-  .main { height: calc(100vh - 55px); min-height: 480px; }
+  .main {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 480px;
+  }
+  .frame { flex: 1 1 auto; height: 0; min-height: 0; }
+  .overview { position: static; flex: 1 1 auto; min-height: 0; }
   .ov-hero { padding: 2.25rem 1.5rem 2rem; }
   .ov-title { font-size: 33px; }
   .ov-body { padding: 1.5rem 1.5rem 2.5rem; }
@@ -211,10 +222,10 @@ body {
     <div class="side-head">
       <div class="brand-eyebrow">Graduation Trip · 2026</div>
       <div class="brand-title">Rockies to the Pacific</div>
-      <div class="brand-sub">Two countries, six parks, seventeen days</div>
+      <div class="brand-sub">Two countries, six parks, nineteen days</div>
       <div class="brand-meta">
-        <span><span class="m-dot"></span>Jul 21 – Aug 6, 2026</span>
-        <span><span class="m-dot"></span>Sea to Sky → Canadian Rockies → Montana → Washington → Vancouver</span>
+        <span><span class="m-dot"></span>Jul 19 – Aug 6, 2026</span>
+        <span><span class="m-dot"></span>Vancouver → Sea to Sky → Canadian Rockies → Montana → Washington → Vancouver</span>
       </div>
     </div>
 
@@ -246,14 +257,14 @@ body {
         <div class="ov-title">Rockies to the Pacific</div>
         <div class="ov-subtitle">From Howe Sound to the Rockies and the wild Olympic coast</div>
         <div class="ov-stats">
-          <div class="ov-stat"><div class="num">17</div><div class="lbl">Days</div></div>
-          <div class="ov-stat"><div class="num">8</div><div class="lbl">Legs</div></div>
+          <div class="ov-stat"><div class="num">19</div><div class="lbl">Days</div></div>
+          <div class="ov-stat"><div class="num">9</div><div class="lbl">Legs</div></div>
           <div class="ov-stat"><div class="num">2</div><div class="lbl">Countries</div></div>
           <div class="ov-stat"><div class="num">6</div><div class="lbl">National parks</div></div>
         </div>
       </div>
       <div class="ov-body">
-        <p class="ov-lead">A seventeen-day road trip beginning with the Sea-to-Sky drive from Vancouver to Kamloops, then crossing the Canadian Rockies, Montana, and the Pacific Northwest before returning to Vancouver. Pick any leg to see its full plan.</p>
+        <p class="ov-lead">A nineteen-day trip beginning with two unhurried Vancouver days, then following the Sea-to-Sky road through the Canadian Rockies, Montana, and the Pacific Northwest before returning to Vancouver. Pick any leg to see its full plan.</p>
         <div class="ov-grid" id="ovGrid"><!-- cards injected by JS --></div>
       </div>
     </div>
@@ -266,6 +277,7 @@ body {
 
 <script>
 var LEGS = [
+  { id: 'vancouver', file: 'itineraries/vancouver_itinerary.html', name: 'Vancouver', dates: 'Jul 19–20', color: '#A6633E', desc: 'Stanley Park, Gastown, Granville Island, and a deliberately slow start to the trip.' },
   { id: 'sea-to-sky', file: 'itineraries/vancouver_to_kamloops_itinerary.html', name: 'Sea to Sky', dates: 'Jul 21', color: '#236B7A', desc: 'Porteau Cove, Majestic, Shannon Falls, Whistler, and the mountain road to Kamloops.' },
   { id: 'jasper',    file: 'itineraries/jasper_itinerary.html',            name: 'Jasper',              dates: 'Jul 22–23', color: '#14797E', desc: 'Maligne Lake, Sulphur Skyline, and Miette Hot Springs from a Hinton base.' },
   { id: 'icefields', file: 'itineraries/icefields_parkway_itinerary.html', name: 'Icefields Parkway',   dates: 'Jul 24',    color: '#2E8FA8', desc: 'The full southbound run — waterfalls, the Athabasca Glacier, Peyto and Bow lakes.' },
@@ -319,7 +331,7 @@ ovNav.id = 'nav-overview';
 ovNav.innerHTML =
   '<span class="nav-leg" style="background:#46727C">★</span>' +
   '<span class="nav-body"><span class="nav-name">Trip overview</span>' +
-  '<span class="nav-dates">All eight legs at a glance</span></span>';
+  '<span class="nav-dates">All nine legs at a glance</span></span>';
 nav.insertBefore(ovNav, nav.children[1]);
 
 function clearActive(){

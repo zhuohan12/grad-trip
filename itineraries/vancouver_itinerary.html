@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vancouver — July 19–20 Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper: #F7F5F0;
+  --ink: #1A1A1A;
+  --ink-mid: #5A5855;
+  --ink-light: #9A9693;
+  --border: #E0DCD4;
+  --harbour: #216C78;
+  --park: #35684B;
+  --market: #A6633E;
+  --city: #4E5E83;
+  --hero-bg: #09131E;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero {
+  background: var(--hero-bg);
+  padding: 3rem 3rem 2.5rem;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(to right, var(--harbour) 0%, var(--park) 38%, var(--market) 72%, var(--city) 100%);
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #78ABB4;
+  margin-bottom: 0.75rem;
+}
+
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: #EDE8DF;
+  line-height: 1.08;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: #89B3BA;
+  margin-bottom: 1.75rem;
+}
+
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #91B7BE; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #4C929E; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; letter-spacing: 0.01em; }
+.eco-harbour { background: rgba(33,108,120,0.42); color: #ACD9DF; border: 1px solid rgba(70,143,154,0.38); }
+.eco-park { background: rgba(53,104,75,0.46); color: #BED9C7; border: 1px solid rgba(79,132,99,0.38); }
+.eco-market { background: rgba(166,99,62,0.42); color: #E3C2AF; border: 1px solid rgba(186,119,82,0.38); }
+
+/* ── MAPS ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 2rem; }
+.map-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.625rem; }
+.map-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+
+.gmaps-btn {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-mid);
+  text-decoration: none;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #fff;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.gmaps-btn:hover, .gmaps-btn:focus-visible { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map {
+  width: 100%;
+  height: 340px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: #DDE6E0;
+}
+
+.map-fallback {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-mid);
+}
+
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.lg-item { display: flex; align-items: center; gap: 6px; }
+.lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.lg-line { width: 18px; height: 0; border-top: 2px dashed var(--city); }
+.map-note { margin-top: 0.45rem; font-size: 11px; color: var(--ink-light); line-height: 1.5; }
+
+.map-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1.5px solid var(--harbour);
+  color: var(--harbour);
+}
+
+.market-day .day-header { border-bottom-color: var(--market); color: var(--market); }
+.day-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  padding-top: 2px;
+  min-width: 48px;
+}
+
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-top: 3px;
+}
+
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute;
+  left: -2.25rem;
+  top: 7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid var(--paper);
+  background: var(--harbour);
+}
+
+.dot-park { background: var(--park); }
+.dot-market { background: var(--market); }
+.dot-city { background: var(--city); }
+.stop-time {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 3px;
+}
+
+.stop-name { font-family: 'Playfair Display', serif; font-size: 17.5px; font-weight: 600; color: var(--ink); margin-bottom: 5px; line-height: 1.2; }
+.stop-name a { color: inherit; text-decoration: underline; text-decoration-color: rgba(26,26,26,0.28); text-underline-offset: 3px; }
+.stop-name a:hover, .stop-name a:focus-visible { text-decoration-color: currentColor; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.tag-harbour { background: #D9EAED; color: #245D67; }
+.tag-park { background: #DFECE3; color: #2F6044; }
+.tag-market { background: #F1E2D8; color: #824725; }
+.tag-city { background: #E5E8F0; color: #43506F; }
+.tag-warn { background: #FDF0E6; color: #8B4410; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 670px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+.eco-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── LOGISTICS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #EDEAE3; border-left: 4px solid var(--harbour); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; letter-spacing: 0.01em; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+.tip a { color: var(--harbour); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.footer {
+  margin-top: 2rem;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--ink-light);
+}
+
+@media (max-width: 640px) {
+  .page { padding-bottom: 2rem; }
+  .hero { padding: 2.25rem 1.5rem 2rem; }
+  .hero-title { font-size: 36px; }
+  .hero-subtitle { font-size: 16px; }
+  .maps-section { padding: 1.5rem 1.25rem 0; }
+  .content { padding: 0 1.25rem; }
+  .map-header { align-items: flex-start; flex-direction: column; }
+  .trip-map { height: 270px; }
+  .tips-grid { grid-template-columns: 1fr; }
+  .footer { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+}
+
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: #fff; }
+  .page { max-width: none; padding-bottom: 0; }
+  .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .hero, .map-block, .tips { break-inside: avoid; page-break-inside: avoid; }
+  .day-header { break-after: avoid; }
+  .stop, .day-section { break-inside: avoid; page-break-inside: avoid; }
+  .gmaps-btn { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div class="hero-eyebrow">Vancouver &nbsp;·&nbsp; Coast Salish lands &nbsp;·&nbsp; British Columbia</div>
+    <h1 class="hero-title">Vancouver, slowly</h1>
+    <div class="hero-subtitle">Harbour paths, old-growth edges, and an unhurried market day</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>Sunday–Monday, July 19–20, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>2 city days · transit + walking</div>
+      <div class="meta-item"><span class="meta-dot"></span>Free attractions · food and fares extra</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-harbour">Coal Harbour</span>
+      <span class="eco-badge eco-park">Stanley Park</span>
+      <span class="eco-badge eco-market">Granville Island</span>
+    </div>
+  </section>
+
+  <section class="maps-section">
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">July 19 · Arrival, park, and harbour evening</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&amp;origin=Lost+Lagoon+Nature+House,Vancouver,BC&amp;destination=Stanley+Park+Loop,Vancouver,BC&amp;waypoints=Brockton+Point+Totem+Pole,Vancouver,BC|Brockton+Point+Lighthouse,Vancouver,BC|Lumberman%27s+Arch,Vancouver,BC&amp;travelmode=walking">Open park route</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#35684B"></span>Stanley Park walk</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#216C78"></span>Harbour walk</div>
+        <div class="lg-item"><span class="lg-line"></span>Schematic transit</div>
+      </div>
+      <p class="map-note">Transit lines are schematic. Use TransLink Trip Planner for the live route from the Airbnb.</p>
+    </div>
+
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">July 20 · Granville Island to Kitsilano</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&amp;origin=Granville+Island+Public+Market,Vancouver,BC&amp;destination=Kitsilano+Beach+Park,Vancouver,BC&amp;waypoints=Net+Loft,Granville+Island,Vancouver,BC|Vanier+Park,Vancouver,BC&amp;travelmode=walking">Open walking route</a>
+      </div>
+      <div id="day2-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#A6633E"></span>Market stops</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#216C78"></span>Waterfront option</div>
+        <div class="lg-item"><span class="lg-line"></span>Transit to base</div>
+      </div>
+      <p class="map-note">Vanier Park and Kits Beach are optional; turn back from Granville Island whenever the day feels full.</p>
+    </div>
+  </section>
+
+  <main class="content">
+    <section class="day-section">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <h2 class="day-title">Land, settle in, and sample the park</h2>
+          <div class="day-date">Sunday, July 19 · Arrival day · Keep every afternoon stop optional</div>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">6:50 AM</div>
+          <h3 class="stop-name">Arrive at Vancouver International Airport</h3>
+          <div class="stop-tags">
+            <span class="tag tag-city">AC020</span>
+            <span class="tag tag-warn">Arrival buffer</span>
+          </div>
+          <p class="stop-desc">Zhan Hong and Dominic land first. Allow roughly 90 minutes for immigration, bags, and the airport transfer decision; breakfast can wait until luggage is under control.</p>
+          <div class="stop-specs"><div class="spec"><b>Flight</b> Singapore → Vancouver · lands 6:50 AM local</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">9:15 AM</div>
+          <h3 class="stop-name">Leave bags at the Vancouver Airbnb</h3>
+          <div class="stop-tags"><span class="tag tag-warn">Confirm with host</span></div>
+          <p class="stop-desc">The booking at 854 East 23rd Avenue starts at 4:00 PM. Obtain the host's written approval for an early bag drop; if the host cannot help, pre-book paid luggage storage instead of sightseeing with suitcases.</p>
+          <div class="stop-specs"><div class="spec"><b>Base</b> 854 East 23rd Avenue · check-in 4:00 PM</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">10:00 AM</div>
+          <h3 class="stop-name">Breakfast near Main Street and Fraser Street</h3>
+          <p class="stop-desc">Eat close to the Airbnb and decide how everyone feels. Granville Island is deliberately excluded today: its World Cup Final closing watch party opens three hours before the noon match and may reach its 1,000-person capacity.</p>
+          <div class="stop-specs"><div class="spec">Breakfast + reset · about 1 hr</div></div>
+        </article>
+
+        <div class="eco-divider">Only continue if the flight has not won</div>
+
+        <article class="stop">
+          <div class="stop-dot dot-park"></div>
+          <div class="stop-time">11:15 AM</div>
+          <h3 class="stop-name">Take bus 19 to Stanley Park</h3>
+          <div class="stop-tags"><span class="tag tag-park">Direct bus</span></div>
+          <p class="stop-desc">Walk to the nearest 19 stop on the Kingsway corridor and confirm the live departure in Trip Planner. Get off near Lost Lagoon; there is no transit around the park, so commit only to the short route ending at Stanley Park Loop.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-park"></div>
+          <div class="stop-time">12:00 PM</div>
+          <h3 class="stop-name">Stanley Park sampler</h3>
+          <div class="stop-tags">
+            <span class="tag tag-park">Free</span>
+            <span class="tag tag-park">Easy walking</span>
+          </div>
+          <p class="stop-desc">Follow the Coal Harbour seawall counter-clockwise from Lost Lagoon and the Rowing Club past the totem poles, Brockton Point Lighthouse, and Lumberman's Arch. Finish at Stanley Park Loop for bus 19; do not force the full 9 km Seawall after a long-haul flight.</p>
+          <div class="stop-specs"><div class="spec"><b>Counter-clockwise park arc</b> about 3.5–4 km · about 2½ hrs · easy</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">3:00 PM</div>
+          <h3 class="stop-name">Return to the Airbnb</h3>
+          <p class="stop-desc">Head back before check-in, shower, and rest. This pause is part of the itinerary, not spare time waiting to be filled.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-harbour"></div>
+          <div class="stop-time">6:30 PM</div>
+          <h3 class="stop-name">Gastown Steam Clock and Coal Harbour</h3>
+          <div class="stop-tags">
+            <span class="tag tag-harbour">Free evening walk</span>
+            <span class="tag tag-warn">Skip if crowded</span>
+          </div>
+          <p class="stop-desc">Reach the clock just before 7:00 PM for its on-the-hour steam display, then walk Water Street to Canada Place and Jack Poole Plaza. Downtown Granville Street remains a World Cup fan zone through today, so skip this outing if celebrations, transit crowding, or jet lag feel draining.</p>
+          <div class="stop-specs"><div class="spec">Gastown → Canada Place → Jack Poole Plaza · about 2 km · about 1½ hrs</div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="day-section market-day">
+      <div class="day-header">
+        <div class="day-num">02</div>
+        <div class="day-info">
+          <h2 class="day-title">Granville Island and an easy False Creek afternoon</h2>
+          <div class="day-date">Monday, July 20 · One main outing · Early finish</div>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">9:15 AM</div>
+          <h3 class="stop-name">Leave for Granville Island</h3>
+          <div class="stop-tags"><span class="tag tag-city">Transit day</span></div>
+          <p class="stop-desc">Use the live TransLink route from the Airbnb. Bus 50 serves the island entrance from downtown and the False Creek corridor; transfers inside a 90-minute fare window do not require another fare.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-market"></div>
+          <div class="stop-time">10:00 AM</div>
+          <h3 class="stop-name">Granville Island Public Market</h3>
+          <div class="stop-tags">
+            <span class="tag tag-market">Free to browse</span>
+            <span class="tag tag-market">Market day</span>
+          </div>
+          <p class="stop-desc">Start after the Sunday watch party has cleared. Browse the market at an easy pace, share a few snacks, and use the waterfront seating when the aisles feel busy. Monday summer hours are 9:00 AM–6:00 PM.</p>
+          <div class="stop-specs"><div class="spec">Market browse · about 1½ hrs · food extra</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-market"></div>
+          <div class="stop-time">11:30 AM</div>
+          <h3 class="stop-name">Net Loft and Railspur Alley</h3>
+          <p class="stop-desc">Cross into the Net Loft, open 10:00 AM–6:00 PM, for small shops, then wander the studios along Railspur Alley. Browsing is free; avoid turning the stop into a shopping checklist.</p>
+          <div class="stop-specs"><div class="spec">Artisan loop · about 1 hr</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-market"></div>
+          <div class="stop-time">12:30 PM</div>
+          <h3 class="stop-name">Lunch by False Creek</h3>
+          <p class="stop-desc">Pick up lunch from the market and eat outside if the weather cooperates. The small harbour ferries are scenic but paid; use one only if the group prefers a ride to more walking.</p>
+          <div class="stop-specs"><div class="spec">Lunch + waterfront rest · about 1 hr</div></div>
+        </article>
+
+        <div class="eco-divider">Optional waterfront extension</div>
+
+        <article class="stop">
+          <div class="stop-dot dot-harbour"></div>
+          <div class="stop-time">1:30 PM</div>
+          <h3 class="stop-name">Vanier Park and Kitsilano Beach</h3>
+          <div class="stop-tags">
+            <span class="tag tag-harbour">Optional</span>
+            <span class="tag tag-harbour">Free waterfront</span>
+          </div>
+          <p class="stop-desc">Follow the False Creek Seawall west through Vanier Park to Kits Beach. This is the only extension: if energy is low, stay on Granville Island's benches and head home instead.</p>
+          <div class="stop-specs"><div class="spec"><b>Granville → Kits Beach</b> about 2.5 km · about 45 min one way · easy</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">3:30 PM</div>
+          <h3 class="stop-name">Return to East 23rd Avenue</h3>
+          <p class="stop-desc">Take transit back from Kitsilano or bus 50 from Granville Island. Keep the late afternoon empty rather than adding another neighbourhood.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-city"></div>
+          <div class="stop-time">5:00 PM</div>
+          <h3 class="stop-name">Groceries, packing, and an early night</h3>
+          <div class="stop-tags"><span class="tag tag-warn">Protect July 21</span></div>
+          <p class="stop-desc">Buy breakfast, water, and road snacks, then pack before dinner. Although Airbnb checkout is 11:00 AM, leave with all luggage around 8:15 AM for the 9:00 AM Marine Drive rental handover; do not plan to return before the 10:00 AM Sea-to-Sky departure.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="tips">
+      <h2 class="tips-heading">Field notes &amp; logistics</h2>
+      <div class="tips-grid">
+        <p class="tip"><b>Notion anchors</b> — The <a href="https://app.notion.com/p/c3de8317612c8297ba1f010c03964340" target="_blank" rel="noopener">Canada Trip 2026 page</a> confirms the staggered AC020 arrivals, July 19–21 Airbnb, and July 21 rental handover.</p>
+        <p class="tip"><b>Luggage</b> — Obtain written host approval for a morning bag drop. Check-in is 4:00 PM; pre-booked paid storage is the fallback, not carrying luggage through Stanley Park.</p>
+        <p class="tip"><b>World Cup Final</b> — Granville Island's <a href="https://granvilleisland.com/watchparty" target="_blank" rel="noopener">closing watch party</a> is on July 19 and can reach its 1,000-person capacity. Keep Granville Island on Monday.</p>
+        <p class="tip"><b>Stanley Park</b> — The park is generally open 6:00 AM–10:00 PM. There is no transit around the park; use the short sampler and check the <a href="https://vancouver.ca/parks-recreation-culture/stanley-park.aspx" target="_blank" rel="noopener">City of Vancouver park page</a> for alerts.</p>
+        <p class="tip"><b>Transit</b> — Adult contactless fare is C$3.50 from July 1, 2026 and lasts 90 minutes. Sunday travel is one zone; a DayPass is unlikely to beat pay-as-you-go here. Check <a href="https://www.translink.ca/tripplanner" target="_blank" rel="noopener">Trip Planner</a> before each departure.</p>
+        <p class="tip"><b>Granville hours</b> — Public Market summer hours are 9:00 AM–6:00 PM Monday–Wednesday; individual vendors vary. Recheck the <a href="https://granvilleisland.com/directions-and-parking" target="_blank" rel="noopener">official visitor information</a> for changes.</p>
+        <p class="tip"><b>Weather rule</b> — Stanley Park is the weather-dependent block. In heavy rain, shorten it rather than moving Granville Island into Sunday's event crowd.</p>
+        <p class="tip"><b>Budget</b> — Every named attraction is free. Pay only for transit and food; the False Creek ferry, aquarium, rentals, and market purchases are optional.</p>
+        <p class="tip"><b>July 21 rendezvous</b> — Zhuo Han and Jun Min land at YVR at 6:50 AM. They should take a taxi or rideshare with luggage directly to Enterprise at 10-970 SW Marine Drive and coordinate the meeting before the 9:00 AM handover.</p>
+        <p class="tip"><b>Rental counter</b> — Pack passports, licences, rental confirmation, payment card, chargers, water, breakfast, and road snacks on Monday. Everyone who may drive should attend with a valid licence.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Vancouver &nbsp;·&nbsp; Stanley Park &nbsp;·&nbsp; False Creek</span>
+      <span>July 19–20, 2026</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el) {
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Arrive at Vancouver International Airport': 'Vancouver International Airport',
+    'Leave bags at the Vancouver Airbnb': '854 East 23rd Avenue Vancouver BC',
+    'Breakfast near Main Street and Fraser Street': 'Fraser Street and East 23rd Avenue Vancouver BC',
+    'Take bus 19 to Stanley Park': 'Stanley Park Loop Vancouver BC',
+    'Stanley Park sampler': 'Brockton Point Totem Pole Vancouver BC',
+    'Return to the Airbnb': '854 East 23rd Avenue Vancouver BC',
+    'Gastown Steam Clock and Coal Harbour': 'Gastown Steam Clock Vancouver BC',
+    'Leave for Granville Island': 'Granville Island Public Market Vancouver BC',
+    'Granville Island Public Market': 'Granville Island Public Market Vancouver BC',
+    'Net Loft and Railspur Alley': 'Net Loft Granville Island Vancouver BC',
+    'Lunch by False Creek': 'Granville Island Public Market Vancouver BC',
+    'Vanier Park and Kitsilano Beach': 'Vanier Park Vancouver BC',
+    'Return to East 23rd Avenue': '854 East 23rd Avenue Vancouver BC',
+    'Groceries, packing, and an early night': '854 East 23rd Avenue Vancouver BC'
+  });
+
+  if (typeof L === 'undefined') {
+    document.querySelectorAll('.trip-map').forEach(function(el) {
+      el.innerHTML = '<div class="map-fallback">Map unavailable. Open the Google Maps route link above.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function buildMap(id, stops, segments) {
+    var map = L.map(id, { scrollWheelZoom: false });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 14,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = [];
+    stops.forEach(function(stop) {
+      L.marker([stop.lat, stop.lng], { icon: pin(stop.color, stop.label) })
+        .addTo(map)
+        .bindPopup('<b>' + stop.name + '</b><br>' + stop.desc);
+      bounds.push([stop.lat, stop.lng]);
+    });
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    segments.forEach(function(segment) {
+      L.polyline(segment.points, {
+        color: segment.color,
+        weight: segment.weight || 3,
+        opacity: segment.opacity || 0.72,
+        dashArray: segment.dash || null
+      }).addTo(map);
+    });
+  }
+
+  buildMap('day1-map', [
+    { name: 'YVR', lat: 49.1947, lng: -123.1792, label: 'A', color: '#4E5E83', desc: '6:50 AM · AC020 arrival' },
+    { name: 'Vancouver Airbnb', lat: 49.2497827, lng: -123.0866645, label: 'H', color: '#4E5E83', desc: 'Bag drop to confirm · check-in 4:00 PM' },
+    { name: 'Lost Lagoon', lat: 49.29440, lng: -123.13787, label: '1', color: '#35684B', desc: 'Get off near the park entrance' },
+    { name: 'Brockton Point totem poles', lat: 49.29920, lng: -123.12123, label: '2', color: '#35684B', desc: 'Free landmark stop' },
+    { name: 'Brockton Point Lighthouse', lat: 49.30069, lng: -123.11727, label: '3', color: '#35684B', desc: 'Counter-clockwise seawall stop' },
+    { name: 'Stanley Park Loop', lat: 49.300517, lng: -123.133483, label: '4', color: '#35684B', desc: 'Finish here for bus 19' },
+    { name: 'Gastown Steam Clock', lat: 49.284384, lng: -123.10889, label: '5', color: '#216C78', desc: 'Aim just before 7:00 PM' },
+    { name: 'Canada Place', lat: 49.28854, lng: -123.11114, label: '6', color: '#216C78', desc: 'Evening waterfront walk' },
+    { name: 'Jack Poole Plaza', lat: 49.289357, lng: -123.117665, label: '7', color: '#216C78', desc: 'Finish by about 8:30 PM' }
+  ], [
+    { color: '#4E5E83', dash: '5 7', opacity: 0.38, points: [[49.1947,-123.1792], [49.2497827,-123.0866645], [49.29440,-123.13787]] },
+    { color: '#35684B', points: [[49.29440,-123.13787], [49.29671,-123.13421], [49.29920,-123.12123], [49.30069,-123.11727], [49.30255,-123.13049], [49.300517,-123.133483]] },
+    { color: '#4E5E83', dash: '5 7', opacity: 0.38, points: [[49.300517,-123.133483], [49.2497827,-123.0866645], [49.284384,-123.10889]] },
+    { color: '#216C78', points: [[49.284384,-123.10889], [49.28854,-123.11114], [49.289357,-123.117665]] }
+  ]);
+
+  buildMap('day2-map', [
+    { name: 'Vancouver Airbnb', lat: 49.2497827, lng: -123.0866645, label: 'H', color: '#4E5E83', desc: '9:15 AM departure · early return' },
+    { name: 'Granville Island Public Market', lat: 49.27232, lng: -123.13500, label: '1', color: '#A6633E', desc: '10:00 AM · free to browse' },
+    { name: 'Net Loft', lat: 49.27170, lng: -123.13425, label: '2', color: '#A6633E', desc: '11:30 AM · shops and studios' },
+    { name: 'Vanier Park', lat: 49.27780, lng: -123.14378, label: '3', color: '#216C78', desc: 'Optional waterfront extension' },
+    { name: 'Kitsilano Beach', lat: 49.274722, lng: -123.154444, label: '4', color: '#216C78', desc: 'Optional turnaround point' }
+  ], [
+    { color: '#4E5E83', dash: '5 7', opacity: 0.38, points: [[49.2497827,-123.0866645], [49.27232,-123.13500]] },
+    { color: '#A6633E', points: [[49.27232,-123.13500], [49.27170,-123.13425]] },
+    { color: '#216C78', points: [[49.27170,-123.13425], [49.27010,-123.13710], [49.27250,-123.14040], [49.27780,-123.14378], [49.279167,-123.14750], [49.274722,-123.154444]] },
+    { color: '#4E5E83', dash: '5 7', opacity: 0.38, points: [[49.274722,-123.154444], [49.2497827,-123.0866645]] }
+  ]);
+});
+</script>
+</body>
+</html>
