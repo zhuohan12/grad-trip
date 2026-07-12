@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vancouver to Kamloops via Whistler — July 21 Itinerary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper: #F7F5F0;
+  --ink: #1A1A1A;
+  --ink-mid: #5A5855;
+  --ink-light: #9A9693;
+  --border: #E0DCD4;
+  --sound: #236B7A;
+  --forest: #35624A;
+  --alpine: #52688E;
+  --canyon: #A35E38;
+  --hero-bg: #09131E;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.page { max-width: 820px; margin: 0 auto; padding-bottom: 4rem; }
+
+/* ── HERO ── */
+.hero { background: var(--hero-bg); padding: 3rem 3rem 2.5rem; position: relative; }
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(to right, var(--sound) 0%, var(--forest) 34%, var(--alpine) 68%, var(--canyon) 100%);
+}
+.hero-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #74A7B4;
+  margin-bottom: 0.75rem;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: #EDE8DF;
+  line-height: 1.08;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+.hero-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: #83ADBA;
+  margin-bottom: 1.75rem;
+}
+.hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.75rem; }
+.meta-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #91B7C1; }
+.meta-dot { width: 5px; height: 5px; border-radius: 50%; background: #4F91A2; flex-shrink: 0; }
+.eco-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+.eco-badge { font-size: 12px; font-weight: 500; padding: 5px 13px; border-radius: 20px; }
+.eco-sound { background: rgba(35,107,122,0.42); color: #A9D5DD; border: 1px solid rgba(64,135,150,0.38); }
+.eco-forest { background: rgba(53,98,74,0.46); color: #B8D6C4; border: 1px solid rgba(77,126,96,0.38); }
+.eco-alpine { background: rgba(82,104,142,0.46); color: #C3CEE3; border: 1px solid rgba(102,126,164,0.38); }
+
+/* ── MAP ── */
+.maps-section { padding: 2rem 2.5rem 0; }
+.map-block { margin-bottom: 2rem; }
+.map-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.625rem; }
+.map-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.gmaps-btn {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-mid);
+  text-decoration: none;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #fff;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.gmaps-btn:hover, .gmaps-btn:focus-visible { background: var(--ink); color: #fff; border-color: var(--ink); }
+.gmaps-btn::after { content: ' ↗'; }
+.trip-map {
+  width: 100%;
+  height: 340px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: #DDE6E0;
+}
+.map-fallback {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-mid);
+}
+.map-legend { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.625rem; font-size: 12px; color: var(--ink-mid); }
+.lg-item { display: flex; align-items: center; gap: 6px; }
+.lg-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.25); }
+.map-pin {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.map-pin span { transform: rotate(45deg); color: #fff; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 4px; }
+.leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 12.5px; margin: 8px 12px; line-height: 1.5; }
+.leaflet-popup-content b { font-weight: 600; }
+
+/* ── CONTENT ── */
+.content { padding: 0 2.5rem; }
+.day-section { margin-top: 2.75rem; }
+.day-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1.5px solid var(--sound);
+  color: var(--sound);
+}
+.day-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  padding-top: 2px;
+  min-width: 48px;
+}
+.day-info { flex: 1; }
+.day-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.day-date {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-top: 3px;
+}
+.timeline { position: relative; padding-left: 2.25rem; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+.stop { position: relative; padding-bottom: 1.75rem; }
+.stop:last-child { padding-bottom: 0; }
+.stop-dot {
+  position: absolute;
+  left: -2.25rem;
+  top: 7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2.5px solid var(--paper);
+  background: var(--sound);
+}
+.dot-forest { background: var(--forest); }
+.dot-alpine { background: var(--alpine); }
+.dot-canyon { background: var(--canyon); }
+.stop-time {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 3px;
+}
+.stop-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.2;
+}
+.stop-name a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(26,26,26,0.28);
+  text-underline-offset: 3px;
+}
+.stop-name a:hover, .stop-name a:focus-visible { text-decoration-color: currentColor; }
+.stop-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.tag-sound { background: #D8EBEE; color: #245D69; }
+.tag-forest { background: #DFECE3; color: #2F6044; }
+.tag-alpine { background: #E4E8F1; color: #40577C; }
+.tag-canyon { background: #F2E2D8; color: #844526; }
+.tag-warn { background: #FDF0E6; color: #8B4410; }
+.stop-desc { font-size: 13.5px; color: var(--ink-mid); line-height: 1.68; max-width: 670px; }
+.stop-specs { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; }
+.spec { font-size: 12px; color: var(--ink-light); font-weight: 400; }
+.spec b { color: var(--ink-mid); font-weight: 600; }
+.eco-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0.5rem 0 1.5rem;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+.eco-divider::before, .eco-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── LOGISTICS ── */
+.tips { margin-top: 2.75rem; padding: 1.5rem 1.75rem 1.625rem; background: #EDEAE3; border-left: 4px solid var(--sound); }
+.tips-heading { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 1rem; }
+.tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.625rem 2rem; }
+.tip { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+.tip b { color: var(--ink); font-weight: 600; }
+.tip a { color: var(--sound); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.footer {
+  margin-top: 2rem;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--ink-light);
+}
+
+@media (max-width: 640px) {
+  .page { padding-bottom: 2rem; }
+  .hero { padding: 2.25rem 1.5rem 2rem; }
+  .hero-title { font-size: 36px; }
+  .hero-subtitle { font-size: 16px; }
+  .maps-section { padding: 1.5rem 1.25rem 0; }
+  .content { padding: 0 1.25rem; }
+  .map-header { align-items: flex-start; flex-direction: column; }
+  .trip-map { height: 270px; }
+  .tips-grid { grid-template-columns: 1fr; }
+  .footer { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+}
+
+@media print {
+  @page { margin: 1.5cm 2cm; }
+  body { background: #fff; }
+  .page { max-width: none; padding-bottom: 0; }
+  .hero, .tips { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .hero, .map-block, .tips { break-inside: avoid; page-break-inside: avoid; }
+  .day-header { break-after: avoid; }
+  .stop { break-inside: avoid; page-break-inside: avoid; }
+  .gmaps-btn { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <section class="hero">
+    <div class="hero-eyebrow">British Columbia &nbsp;·&nbsp; Sea to Sky &nbsp;·&nbsp; Coast Mountains</div>
+    <h1 class="hero-title">Vancouver to Kamloops</h1>
+    <div class="hero-subtitle">Howe Sound, Whistler, and the slow road through the mountains</div>
+    <div class="hero-meta">
+      <div class="meta-item"><span class="meta-dot"></span>Tuesday, July 21, 2026</div>
+      <div class="meta-item"><span class="meta-dot"></span>Vancouver → Whistler → Kamloops</div>
+      <div class="meta-item"><span class="meta-dot"></span>About 450 km · 7½+ hr driving</div>
+    </div>
+    <div class="eco-strip">
+      <span class="eco-badge eco-sound">Howe Sound</span>
+      <span class="eco-badge eco-forest">Sea-to-Sky forest</span>
+      <span class="eco-badge eco-alpine">Duffey alpine</span>
+    </div>
+  </section>
+
+  <section class="maps-section">
+    <div class="map-block">
+      <div class="map-header">
+        <div class="map-label">July 21 · Highway 99 scenic transfer</div>
+        <a class="gmaps-btn" target="_blank" rel="noopener"
+           href="https://www.google.com/maps/dir/?api=1&amp;origin=970+SW+Marine+Dr+%2310,Vancouver,BC&amp;destination=DoubleTree+by+Hilton+Hotel+Kamloops,339+St+Paul+St,Kamloops,BC&amp;waypoints=Porteau+Cove+Provincial+Park,BC|49.6060,-123.2161|Shannon+Falls+Provincial+Park,BC|49.84621,-123.14964|50.15147,-122.94400|Pemberton,BC|50.41863,-122.27853|50.66250,-121.99090&amp;travelmode=driving">Open in Google Maps</a>
+      </div>
+      <div id="day1-map" class="trip-map"></div>
+      <div class="map-legend">
+        <div class="lg-item"><span class="lg-dot" style="background:#236B7A"></span>Howe Sound stops</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#35624A"></span>Forest viewpoints</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#52688E"></span>Alpine lookouts</div>
+        <div class="lg-item"><span class="lg-dot" style="background:#A35E38"></span>Interior transfer</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="content">
+    <section class="day-section">
+      <div class="day-header">
+        <div class="day-num">01</div>
+        <div class="day-info">
+          <h2 class="day-title">Sea to Sky, Duffey Lake Road, and the Fraser interior</h2>
+          <div class="day-date">Tuesday, July 21 · Long scenic transfer</div>
+        </div>
+      </div>
+
+      <div class="timeline">
+        <article class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">9:00 AM</div>
+          <h3 class="stop-name">Collect the rental car</h3>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Booked pickup</span>
+          </div>
+          <p class="stop-desc">The Canada Trip 2026 itinerary has the rental beginning at 9:00 AM at 970 SW Marine Drive #10, after the 6:50 AM arrival at YVR. Allow about an hour for the transfer from the airport, paperwork, vehicle inspection, luggage loading, and pairing phones for navigation.</p>
+          <div class="stop-specs">
+            <div class="spec"><b>Pickup</b> 970 SW Marine Dr #10 · 9:00 AM booking</div>
+          </div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">10:00 AM</div>
+          <h3 class="stop-name">Depart Vancouver</h3>
+          <div class="stop-tags">
+            <span class="tag tag-sound">Scenic transfer</span>
+          </div>
+          <p class="stop-desc">Leave the rental office with the tank confirmed full and Highway 99 saved offline. Cross Vancouver and the Lions Gate Bridge, then stay on Highway 99 north for about 1 hr 10 min to Porteau Cove. With roughly 450 km and more than 7½ hours of pure driving ahead, protect this departure time.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">11:10 AM</div>
+          <h3 class="stop-name">Porteau Cove lookout and shore</h3>
+          <div class="stop-tags">
+            <span class="tag tag-sound">Required stop</span>
+            <span class="tag tag-forest">Short walk</span>
+          </div>
+          <p class="stop-desc">Use the signed provincial-park entrance and day-use lot. Walk the short path toward the pier and shoreline for the open Howe Sound view; if everyone is moving efficiently, add the park's 300 m lookout trail. Do not substitute roadside parking if the lot is full.</p>
+          <div class="stop-specs">
+            <div class="spec">Shore + lookout &nbsp;·&nbsp; ~25 min &nbsp;·&nbsp; Flush toilets</div>
+          </div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot"></div>
+          <div class="stop-time">11:45 AM</div>
+          <h3 class="stop-name">Majestic boulder</h3>
+          <div class="stop-tags">
+            <span class="tag tag-sound">Required stop</span>
+            <span class="tag tag-warn">View only</span>
+          </div>
+          <p class="stop-desc">The exact pin is Majestic, a V6 deep-water boulder above Howe Sound. Park only at the legal northbound pullout near 49.6060, −123.2161 and follow the informal ground approach; do not use the railway-tunnel route. This schedule allows a look and photos at the boulder, not a climbing session. The predicted Squamish Inner tide is rising after a 6:26 AM low, but cold water, fall consequences, and rescue logistics still make an improvised attempt inappropriate.</p>
+          <div class="stop-specs">
+            <div class="spec"><b>Exact boulder</b> 49°36′11.0″N, 123°13′14.2″W</div>
+            <div class="spec">View stop &nbsp;·&nbsp; ~45 min incl. approach</div>
+          </div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-forest"></div>
+          <div class="stop-time">12:50 PM</div>
+          <h3 class="stop-name">Shannon Falls viewpoint</h3>
+          <div class="stop-tags">
+            <span class="tag tag-sound">Required stop</span>
+            <span class="tag tag-forest">Easy 350 m trail</span>
+          </div>
+          <p class="stop-desc">Take the easy forest path from the day-use lot to the lower viewing platform for the 335 m waterfall. Keep this to the viewpoint rather than continuing toward the Chief. Stay on the trail and platform: BC Parks warns that the creek edges and rocks are extremely slippery and high flow can carry debris.</p>
+          <div class="stop-specs">
+            <div class="spec">Falls viewpoint &nbsp;·&nbsp; ~35 min &nbsp;·&nbsp; Easy</div>
+          </div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-forest"></div>
+          <div class="stop-time">1:50 PM</div>
+          <h3 class="stop-name">Upper Tantalus Lookout</h3>
+          <div class="stop-tags">
+            <span class="tag tag-forest">Worthwhile lookout</span>
+          </div>
+          <p class="stop-desc">Pull into the upper viewpoint on the northbound side for the fast, unobstructed look across the Squamish Valley to the glacier-draped Tantalus Range. Use the viewpoint serving your direction of travel; do not cross Highway 99 on foot or turn across traffic for the lower southbound pullout.</p>
+          <div class="stop-specs"><div class="spec">Roadside pull-off &nbsp;·&nbsp; ~10 min</div></div>
+        </article>
+
+        <div class="eco-divider">Through Whistler to the mountain corridor</div>
+
+        <article class="stop">
+          <div class="stop-dot dot-alpine"></div>
+          <div class="stop-time">2:35 PM</div>
+          <h3 class="stop-name">Green Lake Pullout</h3>
+          <div class="stop-tags">
+            <span class="tag tag-alpine">Worthwhile lookout</span>
+          </div>
+          <p class="stop-desc">Pass through Whistler and stop at the northbound pullout about 6 km beyond the village. The glacial-green lake and surrounding peaks are visible directly from the turnout, making this a better transfer-day pause than finding village parking. Stay behind the barrier and away from the unstable bluff edge.</p>
+          <div class="stop-specs"><div class="spec">Roadside pull-off &nbsp;·&nbsp; ~10 min</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-forest"></div>
+          <div class="stop-time">3:15 PM</div>
+          <h3 class="stop-name">Pemberton fuel and lunch</h3>
+          <div class="stop-tags">
+            <span class="tag tag-warn">Last services</span>
+          </div>
+          <p class="stop-desc">Refuel, use the toilets, and take away lunch before Mount Currie. Download the offline route and check DriveBC one more time while there is reliable service. The next roughly 100 km to Lillooet has no dependable fuel, food, mobile service, rest areas, or EV charging, plus steep grades and tight bends.</p>
+          <div class="stop-specs"><div class="spec">Fuel + takeaway lunch &nbsp;·&nbsp; ~40 min</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-alpine"></div>
+          <div class="stop-time">5:05 PM</div>
+          <h3 class="stop-name">Stl’akw / Duffey Lake Viewpoint</h3>
+          <div class="stop-tags">
+            <span class="tag tag-alpine">Worthwhile lookout</span>
+          </div>
+          <p class="stop-desc">Use the formal gravel viewpoint parking at the east end of Duffey Lake for the best no-hike alpine stop of the day. This is a short photo pause only; there is no potable water, and wind can rise quickly around the lake.</p>
+          <div class="stop-specs"><div class="spec">Roadside viewpoint &nbsp;·&nbsp; ~15 min</div></div>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">6:20 PM</div>
+          <h3 class="stop-name">Seton Lake Lookout</h3>
+          <div class="stop-tags">
+            <span class="tag tag-canyon">Best interior view</span>
+            <span class="tag tag-warn">Short steep trail</span>
+          </div>
+          <p class="stop-desc">Park at the large Highway 99 pullout just west of the final switchback and take the short trail to the elevated view over Seton Lake and the curling road. Budget about 1 km return and 80 m of gain. The trailhead is across the highway from parking: skip this stop if traffic, heat, smoke, or the crossing feels uncomfortable.</p>
+          <div class="stop-specs">
+            <div class="spec"><b>Seton Lake Lookout</b> &nbsp;1 km RT &nbsp;·&nbsp; 80 m gain &nbsp;·&nbsp; ~35 min &nbsp;·&nbsp; Easy–moderate</div>
+            <div class="spec"><b>Pressure valve</b> First stop to cut if 45+ min late</div>
+          </div>
+        </article>
+
+        <div class="eco-divider">Lillooet to Kamloops via Cache Creek</div>
+
+        <article class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">7:05 PM</div>
+          <h3 class="stop-name">Continue north from Lillooet</h3>
+          <p class="stop-desc">Stay on Highway 99 north through Pavilion and Marble Canyon to the Highway 97 junction near Cache Creek, then take Highway 1 east to Kamloops. Do not let navigation reroute the trip south through Lytton. Add only a fuel or bathroom stop; the remaining drive is about 2½ hours.</p>
+        </article>
+
+        <article class="stop">
+          <div class="stop-dot dot-canyon"></div>
+          <div class="stop-time">9:35 PM</div>
+          <h3 class="stop-name">Check in at DoubleTree Kamloops</h3>
+          <div class="stop-tags"><span class="tag tag-canyon">Day complete</span></div>
+          <p class="stop-desc">Finish at 339 St Paul Street after roughly 2½ hours from Lillooet. Keep the evening simple: check in, eat nearby, refill water, and reset the car for the 7:00 AM departure toward Jasper the next morning.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="tips">
+      <h2 class="tips-heading">Field notes &amp; logistics</h2>
+      <div class="tips-grid">
+        <p class="tip"><b>Rental pickup</b> — The <a href="https://app.notion.com/p/38de8317612c80298089dabc856ce6c7" target="_blank" rel="noopener">Canada Trip 2026 booking</a> starts at 9:00 AM at 970 SW Marine Drive #10. The road schedule assumes a one-hour handover and a 10:00 AM departure.</p>
+        <p class="tip"><b>Road status</b> — Check <a href="https://www.drivebc.ca/" target="_blank" rel="noopener">DriveBC</a> before leaving and again in Pemberton. Highway 99 can close with little notice after crashes, wildfire activity, rockfall, or debris flow.</p>
+        <p class="tip"><b>Majestic</b> — The itinerary uses the legal pullout/ground approach described by current climbing access notes. Never use the railway tunnel. A climb is outside today's time and safety budget.</p>
+        <p class="tip"><b>Tide</b> — The <a href="https://tides.gc.ca/en/stations/07811/predictions/annual" target="_blank" rel="noopener">official Squamish Inner prediction</a> for July 21 is low at 6:26 AM, then high at 1:03 PM. Treat it as context, not a safety guarantee.</p>
+        <p class="tip"><b>Remote section</b> — The Mount Currie–Lillooet corridor has steep grades up to 15%, tight 20 km/h curves, single-lane bridges, no passing lanes, and long gaps without mobile service. Use lower gears on descents.</p>
+        <p class="tip"><b>Food and fuel</b> — Buy water, breakfast, and road snacks before pickup, then top up the tank and take away a late lunch in Pemberton. Do not rely on finding dinner before the late Kamloops arrival.</p>
+        <p class="tip"><b>Schedule</b> — All planned stops produce an arrival around 9:35 PM. Keep Porteau Cove, Majestic, and Shannon Falls; if pickup or traffic slips by more than 45 minutes, cut Seton Lake first.</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>Vancouver → Whistler → Kamloops &nbsp;·&nbsp; Highway 99</span>
+      <span>July 21, 2026</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function addMapLinks(links) {
+    document.querySelectorAll('.stop-name').forEach(function(el) {
+      var label = el.textContent.trim();
+      var query = links[label] || label;
+      var a = document.createElement('a');
+      a.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = label;
+      a.setAttribute('aria-label', 'Open ' + label + ' in Google Maps');
+      el.textContent = '';
+      el.appendChild(a);
+    });
+  }
+
+  addMapLinks({
+    'Collect the rental car': '970 SW Marine Dr #10 Vancouver BC',
+    'Depart Vancouver': '970 SW Marine Dr #10 Vancouver BC',
+    'Porteau Cove lookout and shore': 'Porteau Cove Provincial Park BC',
+    'Majestic boulder': '49.6030556,-123.2206111',
+    'Shannon Falls viewpoint': 'Shannon Falls Provincial Park BC',
+    'Upper Tantalus Lookout': '49.84621,-123.14964',
+    'Green Lake Pullout': '50.15147,-122.94400',
+    'Pemberton fuel and lunch': 'Pemberton BC',
+    'Stl’akw / Duffey Lake Viewpoint': '50.41863,-122.27853',
+    'Seton Lake Lookout': '50.66250,-121.99090',
+    'Continue north from Lillooet': 'Lillooet BC',
+    'Check in at DoubleTree Kamloops': 'DoubleTree by Hilton Hotel Kamloops'
+  });
+
+  if (typeof L === 'undefined') {
+    document.querySelectorAll('.trip-map').forEach(function(el) {
+      el.innerHTML = '<div class="map-fallback">Map unavailable. Open the Google Maps route link above.</div>';
+    });
+    return;
+  }
+
+  function pin(color, label) {
+    return L.divIcon({
+      className: '',
+      iconSize: [26, 26],
+      iconAnchor: [13, 26],
+      popupAnchor: [0, -24],
+      html: '<div class="map-pin" style="background:' + color + '"><span>' + label + '</span></div>'
+    });
+  }
+
+  function drawRoute(map, points, color) {
+    var placeholder = L.polyline(points, {
+      color: color,
+      weight: 2,
+      opacity: 0.35,
+      dashArray: '6 8'
+    }).addTo(map);
+
+    var coords = points.map(function(point) {
+      return point[1] + ',' + point[0];
+    }).join(';');
+
+    fetch('https://router.project-osrm.org/route/v1/driving/' + coords +
+      '?overview=full&geometries=geojson')
+      .then(function(response) { return response.json(); })
+      .then(function(data) {
+        if (!data.routes || !data.routes[0]) return;
+        map.removeLayer(placeholder);
+        var line = data.routes[0].geometry.coordinates.map(function(coord) {
+          return [coord[1], coord[0]];
+        });
+        L.polyline(line, { color: color, weight: 3.5, opacity: 0.78 }).addTo(map);
+      })
+      .catch(function() {
+        // Keep the dashed placeholder route.
+      });
+  }
+
+  var map = L.map('day1-map', { scrollWheelZoom: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 14,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  var stops = [
+    { name: 'Vancouver rental pickup', lat: 49.2046394, lng: -123.1290112, label: 'S', color: '#236B7A', desc: '9:00 AM pickup · 10:00 AM departure' },
+    { name: 'Porteau Cove', lat: 49.5594, lng: -123.2358, label: '1', color: '#236B7A', desc: '11:10 AM · Howe Sound shore and lookout' },
+    { name: 'Majestic boulder', lat: 49.6030556, lng: -123.2206111, label: '2', color: '#236B7A', desc: '11:45 AM · approach from legal pullout' },
+    { name: 'Shannon Falls', lat: 49.6721, lng: -123.1588, label: '3', color: '#35624A', desc: '12:50 PM · easy 350 m viewpoint trail' },
+    { name: 'Upper Tantalus Lookout', lat: 49.84621, lng: -123.14964, label: '4', color: '#35624A', desc: '1:50 PM · northbound glacier viewpoint' },
+    { name: 'Green Lake Pullout', lat: 50.15147, lng: -122.94400, label: '5', color: '#52688E', desc: '2:35 PM · quick lake view north of Whistler' },
+    { name: 'Pemberton', lat: 50.3220, lng: -122.8050, label: '6', color: '#35624A', desc: '3:15 PM · fuel, late lunch, offline map' },
+    { name: 'Duffey Lake Viewpoint', lat: 50.41863, lng: -122.27853, label: '7', color: '#52688E', desc: '5:05 PM · formal alpine viewpoint parking' },
+    { name: 'Seton Lake Lookout', lat: 50.66250, lng: -121.99090, label: '8', color: '#A35E38', desc: '6:20 PM · short elevated viewpoint trail' },
+    { name: 'DoubleTree Kamloops', lat: 50.6737352, lng: -120.3331744, label: 'E', color: '#A35E38', desc: 'Expected arrival 9:35 PM' }
+  ];
+
+  var bounds = [];
+  stops.forEach(function(stop) {
+    L.marker([stop.lat, stop.lng], { icon: pin(stop.color, stop.label) })
+      .addTo(map)
+      .bindPopup('<b>' + stop.name + '</b><br>' + stop.desc);
+    bounds.push([stop.lat, stop.lng]);
+  });
+  map.fitBounds(bounds, { padding: [30, 30] });
+
+  drawRoute(map, [
+    [49.2046394, -123.1290112],
+    [49.5594, -123.2358],
+    [49.6060, -123.2161],
+    [49.6721, -123.1588],
+    [49.84621, -123.14964],
+    [50.15147, -122.94400],
+    [50.3220, -122.8050],
+    [50.41863, -122.27853],
+    [50.66250, -121.99090],
+    [50.6737352, -120.3331744]
+  ], '#52688E');
+});
+</script>
+</body>
+</html>
